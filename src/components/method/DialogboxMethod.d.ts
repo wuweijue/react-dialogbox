@@ -37,10 +37,14 @@ export interface IOptions {
     /**
      * 父节点容器
      */
-    containerNode: HTMLElement 
+    containerNode?: HTMLElement 
 }
 
 export interface IOpenOptions extends IOptions{
+
+    header?: boolean
+
+    maskClosable?: boolean
 
     children?: JSX.Element | string
 

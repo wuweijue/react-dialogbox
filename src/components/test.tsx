@@ -4,9 +4,21 @@ import { Dialogbox } from './index';
 
 class TestComponent extends React.Component {
 
+    state = {
+        visible: false
+    }
+
     render() {
         return <><div>
-            <Dialogbox dialogboxStyle='macos' maskClosable={true} visible={true}></Dialogbox>
+            <div>
+                <Dialogbox title='测试对话框' dialogboxStyle='macos' onCancel={()=>{
+                    this.setState({visible:false})
+                }} mask={true} maskClosable={true} visible={this.state.visible}></Dialogbox>
+                <button onClick={()=>{
+                    this.setState({visible:true})
+                }}>test</button>
+            </div>
+           
 
             </div><button onClick={() => {
             
@@ -15,6 +27,9 @@ class TestComponent extends React.Component {
                 title='测试对话框'
                 maskClosable={true}
                 className='aa333'
+                height={300}
+                width={600}
+                mask={false}
                 onOk={() => {
                     dialogbox.close();
                 }}

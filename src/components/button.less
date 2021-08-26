@@ -1,24 +1,15 @@
 .dialogbox-button {
-    &.windows-btn {
 
-        &:focus,
-        &:hover {
-            background: #fff;
-
-            &:focus,
-            &:hover {
-                border-color: #01000C;
-            }
-        }
+    &:hover,&:active {
+        opacity: 0.8;
+        border             : 1px solid #d9d9d9;
     }
 
-    line-height        : 1.5715;
     position           : relative;
     display            : inline-block;
     font-weight        : 400;
     white-space        : nowrap;
     text-align         : center;
-    background-image   : none;
     box-shadow         : 0 2px 0 rgb(0 0 0 / 2%);
     cursor             : pointer;
     transition         : all .3s cubic-bezier(.645, .045, .355, 1);
@@ -27,7 +18,7 @@
     -ms-user-select    : none;
     user-select        : none;
     touch-action       : manipulation;
-    height             : 32px;
+    height             : 28px;
     padding            : 4px 15px;
     font-size          : 14px;
     border-radius      : 4px;
@@ -36,26 +27,39 @@
     border             : 1px solid #d9d9d9;
 
     &.primary {
-        color           : #01000C;
-        background-color: #E3E2E2;
-        border-color    : #E3E2E2;
+        color           : white;
+        background-color: #0170FE;
+        border-color    : #0170FE;
     }
-    font-family     : '黑体';
-    &.macos-btn{
-        height: 24px;
+
+    font-family : '黑体';
+
+    &.macos-btn {
+        height     : 24px;
         line-height: 16px;
-        box-shadow: 1px 1px 1px #ccc;
+        box-shadow : 1px 1px 1px #ccc;
+
         &.primary {
             background-color: #146CFF;
             color           : white;
-            box-shadow: 1px 1px 1px #146CFF;
+            box-shadow      : 1px 1px 1px #146CFF;
             border-color    : #146CFF;
         }
-        font-weight     : bold;
-        
+
+        font-weight : bold;
+
     }
 
     span {
         display: inline-block;
+    }
+}
+
+.windows {
+    .dialogbox-button {
+
+        &:hover {
+            opacity: 0.8;
+        }
     }
 }

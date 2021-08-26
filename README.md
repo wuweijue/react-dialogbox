@@ -1,6 +1,6 @@
 <h1><center>react-dialogbox</center></h1>
-<h2><center>一个基于 react 的对话框 UI，搭配 typescript 食用更佳！</center></h2>
-<h2><center>A dialogbox Library Based on react, better with typescript!</center></h2>
+<h3><center>一个基于 react 的对话框 UI，搭配 typescript 食用更佳！</center></h3>
+<h3><center>A dialogbox Library Based on react, better with typescript!</center></h3>
 <br>
 
 <h3><a href="https://static-1acd801a-1752-4c44-b015-68e7a62c6e6b.bspapp.com/" target="_blank">Demo</a></h3>
@@ -86,7 +86,7 @@ import 'react-dialogbox/lib/dialogbox.css';
 
 /* dialogbox会在第一次引入时挂载到window上，后续可通过window.dialogbox访问 */
 
-import { dialogbox } from 'react-dialogbox';
+import dialogbox from 'react-dialogbox';
 ```
 
 <br>
@@ -355,20 +355,3 @@ class Demo extends React.Components {
 
 ```
 
-
-
-<br>
-<h3>更新日志 ( update log )：</h3>
-
-<div>
-version 1.0.1 : 
-项目启动
-</div>
-<div>
-version 1.0.2 : 
-修改 README 文档
-</div>
-<div>
-version 1.0.2 : 
-统一了属性命名的风格
-</div>

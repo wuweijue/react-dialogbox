@@ -3,7 +3,6 @@ import classNames from 'classnames';
 import Button from './Button';
 import { IDialogboxProps } from './Dialogbox.d';
 import './dialogbox.less';
-import dialogboxMethod from './method/DialogboxMethod';
 
 class Dialogbox extends React.Component<IDialogboxProps, any> {
 
@@ -11,6 +10,8 @@ class Dialogbox extends React.Component<IDialogboxProps, any> {
         super(props);
         this.init(props);
     }
+
+    isEmbedded = false;
 
     init(props) {
         let width = 400, height = 180;
@@ -42,7 +43,7 @@ class Dialogbox extends React.Component<IDialogboxProps, any> {
         }
 
         if (props.height && typeof props.height === 'number') {
-            if (props.width > clientHeight) {
+            if (props.height > clientHeight) {
                 height = clientHeight;
             } else {
                 height = props.height;
@@ -75,18 +76,17 @@ class Dialogbox extends React.Component<IDialogboxProps, any> {
 
         const store = this.props.store;
 
-        let { mask = true, visible, draggable, title, zIndex: customZIndex } = props;
+        let { mask = true, visible, draggable = true, title, zIndex: customZIndex } = props;
 
         let zIndex = store.registerDialogbox(that, mask, visible);
 
         this.state = {
-            visible: visible || false,
             width: width,
             height: height,
             toRight: 0, // 向右的偏移量
             toBottom: 0, // 向下的偏移量
             isExtend: false,
-            draggable: draggable || true,//是否可拖拽
+            draggable: draggable,//是否可拖拽
             dialogboxId: zIndex, // 初始值，用于定位
             zIndex: zIndex, // 控制层级    
             marginTop: 0 - 0.5 * height, //让表单初始时保持居中
@@ -101,9 +101,10 @@ class Dialogbox extends React.Component<IDialogboxProps, any> {
     componentWillReceiveProps(nextProps) {
         const { visible } = nextProps;
         if (visible !== '' && visible !== null) {
-            this.setState({ visible });
             if (visible === false) {
                 this.afterClose();
+            } else {
+                this.props.store.changeDialogboxVisible(this.state.dialogboxId, true);
             }
         }
     }
@@ -120,27 +121,15 @@ class Dialogbox extends React.Component<IDialogboxProps, any> {
         this.props.store.changeDialogboxVisible(this.state.dialogboxId, false);
     }
 
-    close = () => {
-        this.setState({
-            visible: false,
-        }, () => {
-            this.afterClose();
-        })
-    }
-
     onOk() {
         if (this.props.onOk) {
             this.props.onOk();
-        } else {
-            this.close();
         }
     }
 
     onCancel() {
         if (this.props.onCancel) {
             this.props.onCancel()
-        } else {
-            this.close();
         }
     }
 
@@ -440,9 +429,11 @@ class Dialogbox extends React.Component<IDialogboxProps, any> {
     //聚焦
     handleFocus = () => {
         if (this.props.isModal) return;
+        if (this.isEmbedded) return;
         const store = this.props.store;
+        const { dialogboxList } = store;
+
         const maxZIndex = store.maxZIndex;
-        let dialogboxList = store.dialogboxList;
         if (dialogboxList.length > 1 && this.state.zIndex < maxZIndex) {
             let newZIdx = store.promoteZIndex(this.state.dialogboxId);
             this.setState({
@@ -452,21 +443,37 @@ class Dialogbox extends React.Component<IDialogboxProps, any> {
     }
 
     componentDidMount() {
-        if (document.getElementById('dialogbox-wrapper-' + this.state.dialogboxId)) {
-            document.getElementById('dialogbox-root').addEventListener('click', this.handleMaskClick)
-        } else {
-            document.querySelector('.dialogbox-mask').addEventListener('click', this.handleMaskClick)
-        }
+        setTimeout(() => {
+            this.isEmbedded = !!!document.getElementById('dialogbox-wrapper-' + this.state.dialogboxId)
+            if (!this.isEmbedded) {
+                document.getElementById('dialogbox-root').addEventListener('click', this.handleMaskClick)
+            } else {
+                document.querySelector('.dialogbox-mask').addEventListener('click', (e) => {
+                    this.handleMaskClick(e)
+                })
+            }
+        })
     }
 
     handleMaskClick = (e) => {
         const { maskClosable, store } = this.props;
-        if (!maskClosable) return;
-
         const dialogboxList = store.dialogboxList;
-        if (dialogboxList[dialogboxList.length - 1].dialogboxId != this.state.dialogboxId) return;
 
-        this.onCancel();   
+        if (!maskClosable) {
+            return
+        }
+
+        if (e.toElement !== document.querySelector('#dialogbox-root') && e.toElement !== document.querySelector('.dialogbox-mask')) {
+            return
+        }
+
+        if (!this.isEmbedded) {
+            if (dialogboxList[dialogboxList.length - 1].dialogboxId != this.state.dialogboxId) {
+                return
+            }
+        }
+
+        this.onCancel();
     }
 
     footerRender = () => {
@@ -475,18 +482,13 @@ class Dialogbox extends React.Component<IDialogboxProps, any> {
 
         if (Object.prototype.toString.call(footer) === '[object Object]' && (footer as JSX.Element).type) {
             /* 如果是一个react组件 */
-            return <div className='dialogbox-footer-wrapper'
-                onMouseDown={(e) => {
-                    /* 触发高度缩放事件 */
-                    draggable && this.dragScaleY(e)
-                }}
-            >
+            return <div className='dialogbox-footer-wrapper'>
                 {footer}
             </div>
         }
 
         if (footer === false) {
-            return <div className='dialogbox-footer-null'></div>
+            return null
         }
 
         return (
@@ -517,12 +519,73 @@ class Dialogbox extends React.Component<IDialogboxProps, any> {
 
     draggableAngleRender() {
         return ['right-bottom', 'right-top', 'left-bottom', 'left-top'].map(item => {
-            return <div key={item} className={classNames('draggable', item)} onMouseDown={(e) => this.dragScale(e)}></div>
+            return <div key={item} className={classNames('draggableAngle', item)} onMouseDown={(e) => this.dragScale(e)}></div>
         })
     }
 
+    draggableSideRender() {
+        return ['right', 'top', 'bottom', 'left'].map(item => {
+            return <div key={item} className={classNames('draggableSide', item)} onMouseDown={(e) => {
+                item === 'top' || item === 'bottom' ? this.dragScaleY(e) : this.dragScaleX(e)
+            }}></div>
+        })
+    }
+
+    btnListRender() {
+        return <div className='dialogbox-header-btnList'>
+            {this.props.dialogboxStyle != 'macos' ? <>
+                <div
+                    className={classNames('dialogbox-header-btn btn-extend')}
+                    onClick={
+                        () => this.handleExtend()
+                    }
+                >
+                    <i className='dialogbox-icon dialogbox-icon-extend' ></i>
+                </div>
+
+                <div
+                    className='dialogbox-header-btn btn-close'
+                    onClick={
+                        () => this.onCancel()
+                    }>
+                    <i className='dialogbox-icon dialogbox-icon-close' ></i>
+                </div>
+            </>
+                :
+                <>
+                    <div
+                        className={classNames('dialogbox-header-btn macos-style btn-extend')}
+                        onClick={
+                            () => this.handleExtend()
+                        }
+                    >
+                        <i className='dialogbox-icon dialogbox-icon-extend' >
+                            <span className='dialogbox-icon-extend-rectangle'>
+                                <span className='dialogbox-icon-extend-shadow'>
+                                </span>
+                            </span>
+                            <span className='dialogbox-icon-extend-rectangle'>
+                                <span className='dialogbox-icon-extend-shadow'>
+                                </span>
+                            </span>
+                        </i>
+                    </div>
+
+                    <div
+                        className='dialogbox-header-btn macos-style btn-close'
+                        onClick={
+                            () => this.onCancel()
+                        }>
+                        <i className='dialogbox-icon dialogbox-icon-close' ></i>
+                        <i className='dialogbox-icon dialogbox-icon-extend' ></i>
+                    </div>
+                </>
+            }
+        </div>
+    }
+
     render() {
-        const { className: propsClassName, title, closable = true, bodyStyle, dialogboxStyle = 'windows' } = this.props;
+        const { className: propsClassName, title, closable = true, bodyStyle, dialogboxStyle = 'windows', visible, header=true } = this.props;
         let { isExtend, draggable, dialogboxId, toRight, toBottom, transition, width, height, zIndex, marginTop, marginLeft } = this.state;
         const className = classNames('dialogbox', 'dialogbox-animation-in',
             { 'dialogbox-extendStatus': isExtend, [propsClassName]: propsClassName },
@@ -544,7 +607,7 @@ class Dialogbox extends React.Component<IDialogboxProps, any> {
 
                 style={{
                     ...bodyStyle,
-                    display: this.state.visible ? 'flex' : 'none',
+                    display: visible ? 'flex' : 'none',
                     width: width + 'px',
                     height: height + 'px',
                     zIndex: zIndex,
@@ -555,72 +618,35 @@ class Dialogbox extends React.Component<IDialogboxProps, any> {
                 }}>
 
                 {this.draggableAngleRender()}
+                {this.draggableSideRender()}
 
-                <div className='dialogbox-header'
-                    /* 弹窗拖动事件 */
-                    onDoubleClick={(e) => {
-                        this.handleFocus()
-                        e.stopPropagation();
-                        this.handleExtend();
-                    }}
-                    onMouseDown={(e) => {
-                        this.handleFocus()
-                        draggable && this.dragMove(e)
-                    }}
-                >
-                    <div className='dialogbox-header-drag'
+                {header && <div className='dialogbox-header'>
+
+                    <div className='dialogbox-title'/* 弹窗拖动事件 */
+                        onDoubleClick={(e) => {
+                            e.stopPropagation();
+                            this.handleFocus();
+                            this.handleExtend();
+                        }}
                         onMouseDown={(e) => {
                             this.handleFocus()
-                            draggable && this.dragScaleY(e)
-                        }}
-                    >
-
-                    </div>
-                    <div className='dialogbox-title' onMouseDown={(e) => e.stopPropagation()} onDoubleClick={(e) => e.stopPropagation()}>
-                        {title}
+                            draggable && this.dragMove(e)
+                        }}>
+                        <span className='dialogbox-title-content'
+                            onDoubleClick={(e) => {
+                                e.stopPropagation();
+                            }}
+                            onMouseDown={(e) => {
+                                e.stopPropagation();
+                            }}>{title}</span>
                     </div>
 
                     {/* 右上角功能图标 */}
-                    <div className='dialogbox-header-btnList'>
-                        {/* 全屏 */}
-                        <div
-                            className={classNames('dialogbox-header-btn btn-extend', { "isExtend": isExtend })}
-                            onClick={
-                                () => this.handleExtend()
-                            }
-                        >
-                            <i className='icon icon-extend' >
-                                <span className='icon-extend-rectangle'>
-                                    <span className='icon-extend-shadow'>
-                                    </span>
-                                </span>
-                                <span className='icon-extend-rectangle'>
-                                    <span className='icon-extend-shadow'>
-                                    </span>
-                                </span>
-                            </i>
-                        </div>
-
-                        {closable && <div
-                            className='dialogbox-header-btn btn-close'
-                            onClick={
-                                () => this.onCancel()
-                            }>
-                            <i className='icon icon-close' >
-                                <span className='icon-extend-line'></span>
-                                <span className='icon-extend-line'></span>
-                            </i>
-                        </div>}
-                    </div>
-                </div>
+                    {this.btnListRender()}
+                </div>}
 
                 <div
                     className='dialogbox-body dialogbox-scroll'
-                    onMouseDown={(e) => {
-                        {/* 纵向拉伸事件 */ }
-                        this.handleFocus()
-                        draggable && this.dragScaleX(e);
-                    }}
                 >
                     {/* 内容 */}
                     <div className='dialogbox-content'>
