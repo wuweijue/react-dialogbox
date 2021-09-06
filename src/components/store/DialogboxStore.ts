@@ -3,38 +3,50 @@ import IDialogboxStore from './DialogboxStore.d';
 class DialogboxStore implements IDialogboxStore {
 
     constructor() {
-        // document.addEventListener('keydown', (event) => {
-        //     event.preventDefault();
-        //     let focusId = this.dialogboxList.length && this.dialogboxList[this.dialogboxList.length - 1].dialogboxId;
-        //     let reactElement = this.findReactElement(focusId)
-        //     if (!reactElement) return false;
-        //     if (event.keyCode == 13 || event.key == 'Enter') { //回车
-        //         reactElement.props.onOk && reactElement.props.onOk();
-        //     }
+        // 注册键盘事件
+        document.addEventListener('keydown', (event) => {
 
-        //     if (event.keyCode == 27 || event.key == 'Escape') { //esc
-        //         reactElement.props.onCancel && reactElement.props.onCancel();
-        //     }
-        // })
+            if(this.getIsAllDialogboxHide()) return;
+
+            // 找到此时被聚焦的对话框
+            let focusId = this.getFocusItem().dialogboxId;
+            let reactElement = this.findReactElement(focusId);
+
+            if (!reactElement) return;
+
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                reactElement.props.onOk && reactElement.props.onOk();
+            }
+
+            if (event.key === 'Escape') {
+                event.preventDefault();
+                reactElement.props.onCancel && reactElement.props.onCancel();
+            }
+        })
     }
 
     dialogboxList = [];
 
-    maxZIndex = 1000;
-
-    findReactElement(dialogboxId) {
-        let reactElement;
-        this.dialogboxList.forEach(item => {
-            if (item.dialogboxId = dialogboxId) {
-                reactElement = item.reactElement;
-            }
-        })
-
-        return reactElement;
+    // 获取当前被聚焦的元素
+    getFocusItem(){
+        return this.dialogboxList.length && this.dialogboxList[this.dialogboxList.length - 1]
     }
 
+    // 当前被聚焦元素的层级，即最高层级
+    focusZIndex = 1000;
+
+    // 获取dialogboxId对应的对话框react对象
+    findReactElement(dialogboxId) {
+        const dialogbox = this.dialogboxList.find(item => {
+            return item.dialogboxId == dialogboxId;
+        });
+        return dialogbox && dialogbox.reactElement;
+    }
+
+    // 注册新生成的对话框
     registerDialogbox(reactElement, mask, visible) {
-        let dialogboxId = ++this.maxZIndex;
+        let dialogboxId = ++this.focusZIndex;
         this.dialogboxList.push({
             dialogboxId,
             reactElement,
@@ -47,18 +59,19 @@ class DialogboxStore implements IDialogboxStore {
         return dialogboxId;
     }
 
-    changeDialogboxVisible(dialogboxId, visible) {
-        const { idx } = this.getDialogboxById(dialogboxId);
-        this.dialogboxList[idx].visible = visible;
-        this.changeMask()
-    }
-
     unRegisterDialogbox(dialogboxId) {
         const { idx } = this.getDialogboxById(dialogboxId);
         this.dialogboxList.splice(idx, 1);
-        this.changeMask()
+        this.changeMask();
     }
 
+    changeDialogboxVisible(dialogboxId, visible) {
+        const { idx } = this.getDialogboxById(dialogboxId);
+        this.dialogboxList[idx].visible = visible;
+        this.changeMask();
+    }
+
+    // 当弹窗出现或隐藏时去同步遮罩层的状态
     changeMask() {
         const dialogboxMaskDOM = document.querySelector('.dialogbox-mask');
         const isMask = this.getIsDialogboxMask();
@@ -91,15 +104,17 @@ class DialogboxStore implements IDialogboxStore {
         }
     }
 
+    // 判断是否当前所有对话框均已隐藏
     getIsAllDialogboxHide() {
         return this.dialogboxList.every(item => !item.visible)
     }
 
+    // 判断是否当前所有对话框均已隐藏或无遮罩层
     getIsDialogboxMask() {
         return !!this.dialogboxList.find(item => item.visible && item.mask);
     }
 
-    private getDialogboxById(dialogboxId) {
+    getDialogboxById(dialogboxId) {
         let idx = this.dialogboxList.findIndex(item => item.dialogboxId == dialogboxId);
         let item = this.dialogboxList[idx];
         return {
@@ -108,16 +123,17 @@ class DialogboxStore implements IDialogboxStore {
         }
     }
 
+    // 聚焦后提升层级
     promoteZIndex(dialogboxId) {
         for (let i = 0; i < this.dialogboxList.length; i++) {
             if (this.dialogboxList[i].dialogboxId == dialogboxId) {
                 let dialogbox = this.dialogboxList[i];
-                this.dialogboxList.splice(i, 1)
-                this.dialogboxList.push(dialogbox)
+                this.dialogboxList.splice(i, 1);
+                this.dialogboxList.push(dialogbox);
                 break;
             }
         }
-        return ++this.maxZIndex;
+        return ++this.focusZIndex;
     }
 }
 

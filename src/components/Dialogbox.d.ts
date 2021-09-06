@@ -7,6 +7,8 @@ export interface IDialogboxProps {
 
     isModal?: boolean
 
+    fullScreen?: boolean
+
     visible?: boolean
 
     draggable?: boolean

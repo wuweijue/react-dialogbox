@@ -12,7 +12,7 @@ class DialogboxMethod implements IDialogboxMethod {
 
     private createDialogbox(dialogbox, options) {
 
-        const dialogboxId = DialogboxStore.maxZIndex + 1; //保证生成的dialogbox初始时在最上层
+        const dialogboxId = DialogboxStore.focusZIndex + 1; //保证生成的dialogbox初始时在最上层
         const containerNode = options.containerNode || this.options.containerNode;
 
         let dialogboxRoot = document.querySelector('#dialogbox-root');
@@ -51,7 +51,7 @@ class DialogboxMethod implements IDialogboxMethod {
         * }
         */
     public open(options:IOpenOptions): IDialogbox {
-        let dialogboxId = DialogboxStore.maxZIndex + 1;
+        let dialogboxId = DialogboxStore.focusZIndex + 1;
         const dialogbox = <Dialogbox visible={true} store={DialogboxStore} 
             onOk={()=>{
                 this.hideDialogbox(dialogboxId)

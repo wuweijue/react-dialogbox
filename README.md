@@ -27,8 +27,26 @@
 <h3>
 进阶功能 ( Advanced functions )：
 </h3>
-<div>支持拖拽移动，八向宽高拉伸，全屏展示，键盘事件，多个对话框的操作，例如聚焦（类似于操作系统的窗口，多个窗口同时存在时，可以通过点击切换聚焦的对话框，并进行操作）</div>
-<div>It supports drag and drop, eight direction width height stretching, full screen display, keyboard events, and the operation of multiple dialog boxes, such as focusing (similar to the windows of the operating system. When multiple windows exist at the same time, you can click to switch the focused dialog box and operate it)</div>
+<div>
+1.支持对话框拖拽移动，边缘极限控制
+2.支持对话框八向宽高拉伸
+3.支持对话框全屏按钮，双击 header，拖拽到屏幕边缘去切换全屏/恢复默认状态
+4.支持 esc(onCancel) 和 enter(onOk) 的键盘事件
+5.支持非模态框的聚焦操作（多个窗口同时存在时，可以通过点击切换聚焦的对话框）
+6.支持模态框的点击阴影关闭对话框
+7.对话框拥有一系列的过渡动画及阴影效果
+8.支持全局配置默认属性，一次配置全局生效
+</div>
+<div>
+1. Support dialog box dragging and moving and edge limit control
+2. The dialog box supports eight direction width height stretching
+3. Support the full screen button in the dialog box. Double click the header and drag it to the edge of the screen to switch to full screen / restore the default state
+4. Support ESC (OnCancel) and enter (OnOk) keyboard events
+5. Support the focus operation of non modal box (when multiple windows exist at the same time, you can click to switch the focus dialog box)
+6. Support the click shadow of modal box to close the dialog box
+7. The dialog box has a series of transition animation and shadow effects
+8. It supports global configuration of default attributes, and the configuration takes effect globally at one time
+</div>
 
 <br>
 <h3>优化 ( Optimization )：</h3>
@@ -116,11 +134,11 @@ class Demo extends React.Components {
                 展示的内容 content displayed
             <Dialogbox/>
 
-                <button onClick={()=>this.setState({
-                    dialogboxVisible: true
-                })}>
-                    弹出对话框
-                </button>
+            <button onClick={()=>this.setState({
+                dialogboxVisible: true
+            })}>
+                弹出对话框
+            </button>
         </div>
     }
 }
@@ -327,10 +345,16 @@ class Demo extends React.Components {
 
     /**
      * @description 是否支持键盘 esc 关闭和 enter 确认
-     * @defaultValue true
+     * @defaultValue false
      */
     keyboard: boolean
 
+    /**
+     * @description 是否全屏显示
+     * @defaultValue false
+     */
+    fullScreen: boolean
+    
     /**
      * @description dialogbox 层级，多层对话框时不建议使用 Not recommended!
      */

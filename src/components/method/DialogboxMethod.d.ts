@@ -52,6 +52,8 @@ export interface IOpenOptions extends IOptions{
 
     closable?: boolean
 
+    fullScreen?: boolean
+
     mask?: boolean
 
     bodyStyle?: any 

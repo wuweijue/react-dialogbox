@@ -2,7 +2,7 @@ export default class IDialogboxStore {
 
     dialogboxList: dialogbox[]
 
-    maxZIndex:number
+    focusZIndex:number
 
     registerDialogbox(reactElement,mask,visible):void
 

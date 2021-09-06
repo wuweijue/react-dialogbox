@@ -76,7 +76,7 @@ class Dialogbox extends React.Component<IDialogboxProps, any> {
 
         const store = this.props.store;
 
-        let { mask = true, visible, draggable = true, title, zIndex: customZIndex } = props;
+        let { mask = true, visible, draggable = true, title, zIndex: customZIndex, fullScreen } = props;
 
         let zIndex = store.registerDialogbox(that, mask, visible);
 
@@ -96,6 +96,8 @@ class Dialogbox extends React.Component<IDialogboxProps, any> {
             title: title,
             transition: 'none'
         }
+
+        
     }
 
     componentWillReceiveProps(nextProps) {
@@ -216,6 +218,7 @@ class Dialogbox extends React.Component<IDialogboxProps, any> {
             document.onmousemove = null;
         }
     }
+
 
     dragScaleX(e) {
 
@@ -393,7 +396,6 @@ class Dialogbox extends React.Component<IDialogboxProps, any> {
                 marginTop = 0;
                 marginLeft = 0;
                 //若当前不是全屏状态则全屏后禁止拖拽
-
             }
 
         } else {
@@ -433,8 +435,8 @@ class Dialogbox extends React.Component<IDialogboxProps, any> {
         const store = this.props.store;
         const { dialogboxList } = store;
 
-        const maxZIndex = store.maxZIndex;
-        if (dialogboxList.length > 1 && this.state.zIndex < maxZIndex) {
+        const focusZIndex = store.focusZIndex;
+        if (dialogboxList.length > 1 && this.state.zIndex < focusZIndex) {
             let newZIdx = store.promoteZIndex(this.state.dialogboxId);
             this.setState({
                 zIndex: newZIdx,
@@ -453,6 +455,11 @@ class Dialogbox extends React.Component<IDialogboxProps, any> {
                 })
             }
         })
+        setTimeout(()=>{
+            if(this.props.fullScreen){
+                this.handleExtend()
+            }
+        },600)  
     }
 
     handleMaskClick = (e) => {
