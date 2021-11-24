@@ -1,21 +1,20 @@
 import * as ReactDOM from 'react-dom';
 import * as React from 'react';
 import DialogboxStore from '../store/DialogboxStore';
-import IDialogboxMethod, { IDialogbox, IOpenOptions, IOptions } from './DialogboxMethod.d';
+import IDialogboxMethod, { IDialogbox, IOptions } from './DialogboxMethod.d';
 import Dialogbox from '../Dialogbox';
 
 class DialogboxMethod implements IDialogboxMethod {
 
-    private options: IOptions = {
-        containerNode: document.getElementById('root')
-    }
+    options: IOptions = {}
 
     private createDialogbox(dialogbox, options) {
 
         const dialogboxId = DialogboxStore.focusZIndex + 1; //保证生成的dialogbox初始时在最上层
-        const containerNode = options.containerNode || this.options.containerNode;
+        const containerNode = options.containerNode || this.options.containerNode || document.body;
 
         let dialogboxRoot = document.querySelector('#dialogbox-root');
+
         //若不存在#dialogbox-root根节点，则创建一个用于承载dialogbox
         if (!dialogboxRoot) {
             dialogboxRoot = document.createElement('div');
@@ -50,18 +49,18 @@ class DialogboxMethod implements IDialogboxMethod {
         *   reactElement dialogbox组件
         * }
         */
-    public open(options:IOpenOptions): IDialogbox {
+    public open(options: IOptions): IDialogbox {
         let dialogboxId = DialogboxStore.focusZIndex + 1;
-        const dialogbox = <Dialogbox visible={true} store={DialogboxStore} 
-            onOk={()=>{
+        const dialogbox = <Dialogbox visible={true} store={DialogboxStore}
+            onOk={() => {
                 this.hideDialogbox(dialogboxId)
-            }} 
-            onCancel={()=>{
+            }}
+            onCancel={() => {
                 this.hideDialogbox(dialogboxId)
-            }} 
+            }}
             {...options}
-        > 
-            { options && options.children }
+        >
+            {options && options.children}
         </Dialogbox>
         return this.createDialogbox(dialogbox, options || {})
     }
@@ -123,7 +122,7 @@ class DialogboxMethod implements IDialogboxMethod {
     /**
         * @description 设置默认的配置项
         */
-    public setOption(options:IOptions): void {
+    public setOption(options: IOptions): void {
         this.options = { ...this.options, ...options }
     }
 

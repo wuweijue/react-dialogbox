@@ -5,8 +5,10 @@ import dialogboxMethod from './method/DialogboxMethod';
 import { IDialogboxProps } from './Dialogbox.d';
 
 class DragDialogbox extends React.Component<IDialogboxProps>{
+    
     render() {
-        return <Dialogbox store={DialogboxStore} {...this.props} />
+        const props = {...dialogboxMethod.options,...this.props};
+        return <Dialogbox store={DialogboxStore} {...props} />
     }
 }
 

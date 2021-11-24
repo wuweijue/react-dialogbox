@@ -251,7 +251,7 @@ body {
             white-space  : nowrap;
             flex         : 1;
 
-            .dialogbox-title-content {
+            .@{prefix}-title-content {
                 cursor: text;
             }
         }
@@ -331,6 +331,10 @@ body {
         flex    : 1;
         overflow: auto;
         padding : 16px;
+
+        .@{prefix}-content {
+            white-space: normal;
+        }
     }
 
     .@{prefix}-footer-wrapper {

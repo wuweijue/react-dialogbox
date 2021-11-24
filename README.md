@@ -242,10 +242,8 @@ class Demo extends React.Components {
     public hideAllDialogbox(): void
 
     /**
-    * @description 设置默认的配置项 Setting
-    * @params IOption {
-            containerNode: HTMLElement 渲染的根节点的容器,默认是 body
-        }
+    * @description 设置全局的默认的配置项 Setting
+    * @params option 等同于下文中 Dialogbox.props or params 可选属性
     */
     public setOption(option: IOption): void
 ```

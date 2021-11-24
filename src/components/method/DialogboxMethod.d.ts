@@ -13,7 +13,7 @@ export default class IDialogboxMethod {
      * @param options IOpenOptions对象
      * @returns IDialogbox对象
      */
-    public open(options:IOpenOptions): IDialogbox
+    public open(options:IOptions): IDialogbox
 
     /**
      * @description 关闭某个指定的弹窗
@@ -32,15 +32,9 @@ export default class IDialogboxMethod {
     public setOption(options: IOptions): void
 
 }
-
 export interface IOptions {
-    /**
-     * 父节点容器
-     */
-    containerNode?: HTMLElement 
-}
 
-export interface IOpenOptions extends IOptions{
+    containerNode?: HTMLElement 
 
     header?: boolean
 

@@ -2,6 +2,13 @@ import * as React from 'react';
 import dialogboxMethod from '../components/method/DialogboxMethod';
 import { Dialogbox } from './index';
 
+dialogboxMethod.setOption({
+    header: false,
+    footer: false,
+    width: 600,
+    height: 360
+})
+
 class TestComponent extends React.Component {
 
     state = {
@@ -10,24 +17,21 @@ class TestComponent extends React.Component {
 
     render() {
         return <>
-            <div>
-                <div>
-                    <Dialogbox
-                        title='测试对话框' 
-                        dialogboxStyle='macos' 
-                        onCancel={() => {
-                            this.setState({ visible: false })
-                        }} 
-                        mask={true} 
-                        maskClosable={true} 
-                        visible={this.state.visible}>
-                        <input />
-                    </Dialogbox>
-                    <button onClick={() => {
-                        this.setState({ visible: true })
-                    }}>test</button>
-                </div>
-            </div>
+            <Dialogbox
+                title='测试对话框'
+                dialogboxStyle='macos'
+                header={true}
+                onCancel={() => {
+                    this.setState({ visible: false })
+                }}
+                mask={true}
+                maskClosable={true}
+                visible={this.state.visible}>
+                <input />
+            </Dialogbox>
+            <button onClick={() => {
+                this.setState({ visible: true })
+            }}>test</button>
             <button onClick={() => {
                 let dialogbox = dialogboxMethod.showDialogbox(<Dialogbox
                     title='测试对话框'
@@ -41,12 +45,11 @@ class TestComponent extends React.Component {
                         dialogbox.close();
                     }}
                     onCancel={() => {
-                        dialogbox.close()
+                        dialogbox.close();
                         let dialogbox2 = dialogboxMethod.showDialogbox(<Dialogbox
                             onOk={() => dialogbox2.close()}
                             className='333'
                             onCancel={() => {
-
                                 dialogbox2.close()
                             }}
                             visible={true}
