@@ -9,11 +9,10 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
 
 const webpackProdConfig = {
-
     mode: 'production',
     entry: {
         app: [path.join(__dirname, './src/components/index.tsx')]
-    },
+    }, 
     output: {
         path: path.join(__dirname, './lib'),
         filename: 'index.js',
@@ -48,8 +47,7 @@ const webpackProdConfig = {
                     to: ".", 
                 },
             ],
-        }),
-        
+        }), 
     ]
 }
 

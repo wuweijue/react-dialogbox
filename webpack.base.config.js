@@ -1,5 +1,6 @@
 const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const transformDecorators = require("babel-plugin-transform-decorators-legacy")
 
 const webpackBaseConfig = {
 
@@ -7,7 +8,7 @@ const webpackBaseConfig = {
         rules: [
             {
                 exclude: /node_modules/,
-                test: /\.jsx?$/,
+                test: /\.(j|t)sx?$/,
                 use: {
                     loader: 'babel-loader',
                     options: {
@@ -16,7 +17,7 @@ const webpackBaseConfig = {
                                 '@babel/preset-env',
                                 {
                                     corejs: {
-                                        version: 3
+                                        version: 2
                                     },
                                     useBuiltIns: 'usage',
                                     targets: {
@@ -25,6 +26,7 @@ const webpackBaseConfig = {
                                 }
                             ],
                             '@babel/preset-react',
+                            '@babel/preset-typescript'
                         ]
                     }
                 }
@@ -55,23 +57,12 @@ const webpackBaseConfig = {
                 ]
             },
             {
-                exclude: /node_modules/,
-                test: /\.tsx?$/,
-                use: [
-                    {
-                        loader: 'ts-loader',
-                        options: {
-                            transpileOnly: true, //用于加速编译
-                        }
-                    }
-                ]
-            },
-            {
                 test: /\.(png|jpg|jpeg|gif|svg|woff|woff2|eot|ttf|otf)$/,
                 type: 'asset'
             },
         ]
     },
+    
     resolve: {
         alias: {
             'react': path.resolve(__dirname, 'node_modules', 'react'),

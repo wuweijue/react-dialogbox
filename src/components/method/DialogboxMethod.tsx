@@ -11,7 +11,7 @@ class DialogboxMethod implements IDialogboxMethod {
     private createDialogbox(dialogbox, options) {
 
         const dialogboxId = DialogboxStore.focusZIndex + 1; //保证生成的dialogbox初始时在最上层
-        const containerNode = options.containerNode || this.options.containerNode || document.body;
+        const containerNode = options.containerNode || document.body;
 
         let dialogboxRoot = document.querySelector('#dialogbox-root');
 
@@ -40,18 +40,18 @@ class DialogboxMethod implements IDialogboxMethod {
     }
 
     /**
-        * @description 在页面中展示一个弹窗
+        * @description 在页面中展示一个弹窗，并以配置对象作为参数传入
         * @param options
         * @returns IDialogbox {
-        *   DOM,
+        *   DOM, 对话框对应的 dom 节点
         *   dialogboxId, 
-        *   close, 关闭dialogbox的方法
-        *   reactElement dialogbox组件
+        *   close, 关闭对话框的方法
+        *   reactElement dialogbox 组件
         * }
         */
-    public open(options: IOptions): IDialogbox {
-        let dialogboxId = DialogboxStore.focusZIndex + 1;
-        const dialogbox = <Dialogbox visible={true} store={DialogboxStore}
+    public open(options: IOptions = this.options): IDialogbox {
+        const dialogboxId = DialogboxStore.focusZIndex + 1;
+        const dialogboxComponent = <Dialogbox visible={true}
             onOk={() => {
                 this.hideDialogbox(dialogboxId)
             }}
@@ -60,14 +60,15 @@ class DialogboxMethod implements IDialogboxMethod {
             }}
             {...options}
         >
-            {options && options.children}
-        </Dialogbox>
-        return this.createDialogbox(dialogbox, options || {})
+            {options.children}
+        </Dialogbox>;
+        return this.createDialogbox(dialogboxComponent, options)
     }
 
     /**
-        * @description 在页面中展示一个弹窗
+        * @description 在页面中展示一个弹窗，并将对话框组件作为参数传入
         * @param dialogbox 弹窗组件
+        * @param options 
         * @returns IDialogbox {
         *   DOM,
         *   dialogboxId, 
@@ -75,9 +76,7 @@ class DialogboxMethod implements IDialogboxMethod {
         *   reactElement dialogbox组件
         * }
         */
-    public showDialogbox(dialogbox: JSX.Element, options = {
-        containerNode: document.body
-    }): IDialogbox {
+    public showDialogbox(dialogbox: JSX.Element, options = this.options): IDialogbox {
         return this.createDialogbox(dialogbox, options)
     }
 
@@ -86,37 +85,39 @@ class DialogboxMethod implements IDialogboxMethod {
         * @param dialogboxId 需要关闭的弹窗的id值
         */
     public hideDialogbox(dialogboxId: number): void {
+        const dialogboxRootDOM = document.querySelector('#dialogbox-root');
+        const dialogboxWrapperDOM = document.querySelector('#dialogbox-wrapper-' + dialogboxId);
+        const dialogboxDOM = document.querySelector('#dialogbox-' + dialogboxId);
 
-        const dialogboxWrapperDOM = document.querySelector('#dialogbox-wrapper-' + dialogboxId)
         if (dialogboxWrapperDOM) {
-            const dialogboxDOM = document.querySelector('#dialogbox-' + dialogboxId);
-            const dialogboxClassName = dialogboxDOM.className;
-            const dialogboxRootDOM = document.querySelector('#dialogbox-root');
-            if (!dialogboxClassName.includes('dialogbox-animation-out')) {
-                dialogboxDOM.className += ' dialogbox-animation-out'
-            }
+            dialogboxDOM.classList.add('dialogbox-animation-out');
 
-            //设置定时器延时卸载组件是为了展示关闭弹窗的动画效果
+            //设置定时器延时卸载组件是为了展示关闭对话框时的动画效果
             setTimeout(() => {
                 //手动卸载react组件，目的是触发内部组件componentWillUnmount生命周期函数
                 ReactDOM.unmountComponentAtNode(dialogboxWrapperDOM);
                 dialogboxRootDOM.removeChild(dialogboxWrapperDOM);
-                //若#dialogbox-root内弹窗均已关闭，则移除该元素
+
+                //若#dialogbox-root内弹窗均已关闭，则移除根节点
                 if (!document.querySelectorAll('.dialogbox-wrapper').length) {
                     dialogboxRootDOM.parentNode.removeChild(dialogboxRootDOM)
                 }
             }, 300);
         } else {
-            console.warn('不存在dialogboxId为' + dialogboxId + '的dialogbox')
+            console.warn('不存在dialogboxId为' + dialogboxId + '的对话框')
         }
     }
 
     /**
-        * @description 强制关闭所有弹窗和根节点
+        * @description 强制关闭所有对话框，并移除其所在的根节点
         */
     public hideAllDialogbox(): void {
-        let dialogboxRootDOM = document.querySelector('#dialogbox-root');
-        dialogboxRootDOM.parentNode.removeChild(dialogboxRootDOM);
+        const dialogboxRootDOM = document.querySelector('#dialogbox-root');
+        if (dialogboxRootDOM) {
+            dialogboxRootDOM.parentNode.removeChild(dialogboxRootDOM);
+        } else {
+            console.warn('当前并无显示的对话框')
+        }
     }
 
     /**

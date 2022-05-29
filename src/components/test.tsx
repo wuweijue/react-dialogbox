@@ -18,14 +18,28 @@ class TestComponent extends React.Component {
     render() {
         return <>
             <Dialogbox
-                title='测试对话框'
-                dialogboxStyle='macos'
+                title='测试对话框1'
+                // dialogboxStyle='macos'
+                header={true}
+                onCancel={() => {
+                    this.setState({ visible: false })
+                }}
+                mask={true}
+                isModal={false}
+                maskClosable={true}
+                visible={this.state.visible}>
+                <input />
+            </Dialogbox>
+            <Dialogbox
+                title='测试对话框2'
+                // dialogboxStyle='macos'
                 header={true}
                 onCancel={() => {
                     this.setState({ visible: false })
                 }}
                 mask={true}
                 maskClosable={true}
+                isModal={true}
                 visible={this.state.visible}>
                 <input />
             </Dialogbox>

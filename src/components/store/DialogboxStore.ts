@@ -1,4 +1,5 @@
 import IDialogboxStore from './DialogboxStore.d';
+import { observable } from '../publish-subscribe';
 
 class DialogboxStore implements IDialogboxStore {
 
@@ -34,7 +35,7 @@ class DialogboxStore implements IDialogboxStore {
     }
 
     // 当前被聚焦元素的层级，即最高层级
-    focusZIndex = 1000;
+    @observable focusZIndex = 1000;
 
     // 获取dialogboxId对应的对话框react对象
     findReactElement(dialogboxId) {

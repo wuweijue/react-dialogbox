@@ -4,6 +4,8 @@ export default class IDialogboxStore {
 
     focusZIndex:number
 
+    getFocusItem(): dialogbox
+
     registerDialogbox(reactElement,mask,visible):void
 
     unRegisterDialogbox(dialogboxId: number):void

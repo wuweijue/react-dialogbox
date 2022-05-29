@@ -3,7 +3,9 @@ import classNames from 'classnames';
 import Button from './Button';
 import { IDialogboxProps } from './Dialogbox.d';
 import './dialogbox.less';
+import { observer } from './publish-subscribe';
 
+@observer
 class Dialogbox extends React.Component<IDialogboxProps, any> {
 
     constructor(props) {
@@ -11,7 +13,9 @@ class Dialogbox extends React.Component<IDialogboxProps, any> {
         this.init(props);
     }
 
-    isEmbedded = false;
+    dialogboxId;
+
+    isEmbedded = false; // 是否是内嵌在组件中的
 
     init(props) {
         let width = 400, height = 180;
@@ -72,13 +76,11 @@ class Dialogbox extends React.Component<IDialogboxProps, any> {
             width = 200;
         }
 
-        const that = this;
+        const { store, mask = true, visible, draggable = true, title, zIndex: customZIndex, fullScreen } = props;
 
-        const store = this.props.store;
+        const dialogboxId = store.registerDialogbox(this, mask, visible);
 
-        let { mask = true, visible, draggable = true, title, zIndex: customZIndex, fullScreen } = props;
-
-        let zIndex = store.registerDialogbox(that, mask, visible);
+        this.dialogboxId = dialogboxId;
 
         this.state = {
             width: width,
@@ -87,8 +89,7 @@ class Dialogbox extends React.Component<IDialogboxProps, any> {
             toBottom: 0, // 向下的偏移量
             isExtend: false,
             draggable: draggable,//是否可拖拽
-            dialogboxId: zIndex, // 初始值，用于定位
-            zIndex: zIndex, // 控制层级    
+            zIndex: dialogboxId, // 控制层级    
             marginTop: 0 - 0.5 * height, //让表单初始时保持居中
             marginLeft: 0 - 0.5 * width, //让表单初始时保持居中
             historyWidth: width,
@@ -96,8 +97,6 @@ class Dialogbox extends React.Component<IDialogboxProps, any> {
             title: title,
             transition: 'none'
         }
-
-        
     }
 
     componentWillReceiveProps(nextProps) {
@@ -106,21 +105,21 @@ class Dialogbox extends React.Component<IDialogboxProps, any> {
             if (visible === false) {
                 this.afterClose();
             } else {
-                this.props.store.changeDialogboxVisible(this.state.dialogboxId, true);
+                this.props.store.changeDialogboxVisible(this.dialogboxId, true);
             }
         }
     }
 
     componentWillUnmount() {
         this.afterClose();
-        this.props.store.unRegisterDialogbox(this.state.dialogboxId);
+        this.props.store.unRegisterDialogbox(this.dialogboxId);
     }
 
     afterClose() {
         if (this.props.afterClose) {
             this.props.afterClose();
         }
-        this.props.store.changeDialogboxVisible(this.state.dialogboxId, false);
+        this.props.store.changeDialogboxVisible(this.dialogboxId, false);
     }
 
     onOk() {
@@ -135,7 +134,27 @@ class Dialogbox extends React.Component<IDialogboxProps, any> {
         }
     }
 
+    // 用于判断是否允许控制
+    controllable() {
+        const store = this.props.store;
+        let focusItem = store.getFocusItem();
+        let focusId = focusItem.dialogboxId;
+        let isFocus = focusId === this.dialogboxId;
+        let curIsModal = this.props.isModal
+        let foucsItemIsModal = focusItem.reactElement.props.isModal
+        if ((foucsItemIsModal || curIsModal) && !isFocus) {
+            return false // 如果被聚焦的dialogbox是个模态框，或当前选中的dialogbox是个模态框则无法操作其它模态框
+        }
+        return true
+    }
+
+    isfoucs() {
+        const store = this.props.store;
+        return store.focusZIndex === this.state.zIndex;
+    }
+
     dragMove = (e) => {
+        if (!this.controllable()) return
         //当鼠标按下时触发
         e.stopPropagation();
         let pointLeft = e.clientX; //获取此时鼠标距离屏幕左侧的距离
@@ -221,7 +240,7 @@ class Dialogbox extends React.Component<IDialogboxProps, any> {
 
 
     dragScaleX(e) {
-
+        if (!this.controllable()) return
         //当鼠标按下时触发
         e.stopPropagation();
 
@@ -266,7 +285,7 @@ class Dialogbox extends React.Component<IDialogboxProps, any> {
     dialogbox;//dom
 
     dragScaleY(e) {
-
+        if (!this.controllable()) return
         //当鼠标按下时触发
         e.stopPropagation();
 
@@ -310,6 +329,7 @@ class Dialogbox extends React.Component<IDialogboxProps, any> {
     }
 
     dragScale(e) {
+        if (!this.controllable()) return
         e.stopPropagation();
         let { width, toRight: right, } = this.state;
         let pointLeft = e.clientX //获取此时鼠标距离屏幕左侧的距离
@@ -376,7 +396,7 @@ class Dialogbox extends React.Component<IDialogboxProps, any> {
 
     /* 全屏/还原 */
     handleExtend(direction?) {
-
+        if (!this.controllable()) return
         let { clientWidth: width, clientHeight: height } = document.body;
         let marginTop, marginLeft;
         let { draggable, historyWidth, historyHeight, isExtend, toRight } = this.state;
@@ -431,13 +451,11 @@ class Dialogbox extends React.Component<IDialogboxProps, any> {
     //聚焦
     handleFocus = () => {
         if (this.props.isModal) return;
-        if (this.isEmbedded) return;
         const store = this.props.store;
         const { dialogboxList } = store;
-
         const focusZIndex = store.focusZIndex;
         if (dialogboxList.length > 1 && this.state.zIndex < focusZIndex) {
-            let newZIdx = store.promoteZIndex(this.state.dialogboxId);
+            let newZIdx = store.promoteZIndex(this.dialogboxId);
             this.setState({
                 zIndex: newZIdx,
             })
@@ -446,7 +464,7 @@ class Dialogbox extends React.Component<IDialogboxProps, any> {
 
     componentDidMount() {
         setTimeout(() => {
-            this.isEmbedded = !!!document.getElementById('dialogbox-wrapper-' + this.state.dialogboxId)
+            this.isEmbedded = !!!document.getElementById('dialogbox-wrapper-' + this.dialogboxId)
             if (!this.isEmbedded) {
                 document.getElementById('dialogbox-root').addEventListener('click', this.handleMaskClick)
             } else {
@@ -455,11 +473,11 @@ class Dialogbox extends React.Component<IDialogboxProps, any> {
                 })
             }
         })
-        setTimeout(()=>{
-            if(this.props.fullScreen){
+        setTimeout(() => {
+            if (this.props.fullScreen) {
                 this.handleExtend()
             }
-        },600)  
+        }, 600)
     }
 
     handleMaskClick = (e) => {
@@ -475,7 +493,7 @@ class Dialogbox extends React.Component<IDialogboxProps, any> {
         }
 
         if (!this.isEmbedded) {
-            if (dialogboxList[dialogboxList.length - 1].dialogboxId != this.state.dialogboxId) {
+            if (dialogboxList[dialogboxList.length - 1].dialogboxId != this.dialogboxId) {
                 return
             }
         }
@@ -553,7 +571,13 @@ class Dialogbox extends React.Component<IDialogboxProps, any> {
                 <div
                     className='dialogbox-header-btn btn-close'
                     onClick={
-                        () => this.onCancel()
+                        (e) => {
+                            if (!this.controllable()) {
+                                e.preventDefault()
+                            } else {
+                                this.onCancel()
+                            }
+                        }
                     }>
                     <i className='dialogbox-icon dialogbox-icon-close' ></i>
                 </div>
@@ -592,11 +616,13 @@ class Dialogbox extends React.Component<IDialogboxProps, any> {
     }
 
     render() {
-        const { className: propsClassName, title, closable = true, bodyStyle, dialogboxStyle = 'windows', visible, header=true } = this.props;
-        let { isExtend, draggable, dialogboxId, toRight, toBottom, transition, width, height, zIndex, marginTop, marginLeft } = this.state;
+        const { className: propsClassName, title, closable = true, bodyStyle, dialogboxStyle = 'windows', visible, header = true } = this.props;
+        let { isExtend, draggable, toRight, toBottom, transition, width, height, zIndex, marginTop, marginLeft } = this.state;
         const className = classNames('dialogbox', 'dialogbox-animation-in',
             { 'dialogbox-extendStatus': isExtend, [propsClassName]: propsClassName },
-            { [dialogboxStyle]: dialogboxStyle }
+            { [dialogboxStyle]: dialogboxStyle },
+            { 'dialogbox-uncontrolable': !this.controllable() },
+            { 'dialogbox-foucs': this.isfoucs() }
         )
         let transformProps = {}
         if (toRight || toBottom) {
@@ -608,10 +634,14 @@ class Dialogbox extends React.Component<IDialogboxProps, any> {
         return (
             <div
                 ref={(dialogbox) => this.dialogbox = dialogbox}
-                id={'dialogbox-' + dialogboxId}
+                id={'dialogbox-' + this.dialogboxId}
                 className={className}
                 onClick={() => { this.handleFocus() }}
-
+                onMouseDown={e => {
+                    if (!this.controllable()) {
+                        e.preventDefault()
+                    }
+                }}
                 style={{
                     ...bodyStyle,
                     display: visible ? 'flex' : 'none',

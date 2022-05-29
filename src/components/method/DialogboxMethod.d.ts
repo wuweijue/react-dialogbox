@@ -27,11 +27,13 @@ export default class IDialogboxMethod {
     public hideAllDialogbox(): void
 
     /**
-    * @description 强制关闭所有弹窗和根节点
+    * @description 设置全局配置
+    * @param options IOpenOptions对象
     */
     public setOption(options: IOptions): void
 
 }
+
 export interface IOptions {
 
     containerNode?: HTMLElement 
