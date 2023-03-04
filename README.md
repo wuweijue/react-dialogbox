@@ -1,13 +1,12 @@
 <h1><center>react-dialogbox</center></h1>
-<h3><center>一个基于 react 的对话框 UI，搭配 typescript 食用更佳！</center></h3>
+<h3><center>一个基于 React 的对话框 UI，搭配 Typescript 食用更佳！</center></h3>
 <h3><center>A dialogbox Library Based on react, better with typescript!</center></h3>
 <br>
 
 <h3><a href="https://static-1acd801a-1752-4c44-b015-68e7a62c6e6b.bspapp.com/" target="_blank">Demo</a></h3>
 
-
 <div>邮箱 Email：awuweijue@163.com</div>
-<div>欢迎交流与提交bug Welcome to communicate and submit bug</div>
+<div>欢迎交流与提交bug  Welcome to communicate and submit bug</div>
 
 <br>
 <h3>
@@ -59,7 +58,7 @@
 利用 webpack 实现了一系列 js 和 css 的兼容性处理
 </div>
 <div>
-体积：全部原生实现，几乎没有额外的依赖，包体积极小，非常精简
+体积：除 react 外，全部原生实现，几乎没有额外的依赖，包体积极小，非常精简
 </div>
 
 <div>
@@ -71,7 +70,7 @@ Compatibility:
 A series of compatibility processing between JS and CSS is realized by using webpack
 </div>
 <div>
-Volume: all native implementations, almost no additional dependencies, active and small inclusions, very compact
+Volume: Except for react, all native implementations, almost no additional dependencies, active and small inclusions, very compact
 </div>
 
 <br>
@@ -82,10 +81,10 @@ Volume: all native implementations, almost no additional dependencies, active an
 以下示例非完整代码，仅作参考 The following example is incomplete code for reference only</div>
 <br>
 <h5>
-下载 ( install )：
+下载 ( Install )：
 </h5>
 
-``` shell 
+```shell
     npm i react-dialogbox
 
     yarn add react-dialogbox
@@ -93,11 +92,10 @@ Volume: all native implementations, almost no additional dependencies, active an
 
 <br>
 <h5>
-初始化 ( initialization )：
+初始化 ( Initialization )：
 </h5>
 
-
-``` typescript
+```typescript
 /* 在根组件引入样式文件 */
 
 import 'react-dialogbox/lib/dialogbox.css'; 
@@ -112,8 +110,7 @@ import dialogbox from 'react-dialogbox';
 作为组件内嵌使用 ( Embedded as a component )：
 </h5>
 
-
-``` typescript
+```typescript
 
 import { Dialogbox } from 'react-dialogbox';
 
@@ -149,7 +146,8 @@ class Demo extends React.Components {
 通过 dialogbox 的 api 使用 (  Using the API of dialogbox )：
 </h5>
 
-``` typescript
+
+```typescript
 
 import { Dialogbox } from 'react-dialogbox';
 
@@ -186,7 +184,7 @@ class Demo extends React.Components {
 
     hideDialogbox(dialogboxInstance = this.dialogboxInstance){
         /* 关闭 dialogbox 的方法 */
-                          
+                        
         /*方法一：通过创建 dialogbox 弹窗返回的实例对象中的 close 方法*/ 
         dialogboxInstance.close();
 
@@ -198,7 +196,7 @@ class Demo extends React.Components {
     }
 
     render(){
-        return <div>		
+        return <div>	
             <button onClick={()=>this.openDialogbox()}>弹出对话框</button>
         </div>
     }
@@ -209,13 +207,11 @@ class Demo extends React.Components {
 
 <h3>API Document:</h3>
 
-
-
-``` typescript
+```typescript
 
     /* dialogbox 提供以下方法，第一次引用时会赋值给 window.dialogbox */
     (1) dialogbox
-     
+   
     /**
      * @description 在页面中展示一个对话框 Show a dialog box
      * @param Dialogbox 对话框组件 
@@ -248,8 +244,7 @@ class Demo extends React.Components {
     public setOption(option: IOption): void
 ```
 
-
-``` typescript
+```typescript
 
     /* 对话框组件 <Dialogbox {...props} /> 或 dialogbox.openDialogbox(params) */
     (2) Dialogbox.props or params 可选属性
@@ -259,12 +254,6 @@ class Demo extends React.Components {
      * @defaultValue false
      */
     isModal: boolean
-
-    /**
-     * @description dialogbox 的风格
-     * @defaultValue windows
-     */
-    dialogboxStyle: 'windows' | 'macos'
 
     /**
      * @description dialogbox 是否可见 
@@ -352,7 +341,7 @@ class Demo extends React.Components {
      * @defaultValue false
      */
     fullScreen: boolean
-    
+  
     /**
      * @description dialogbox 层级，多层对话框时不建议使用 Not recommended!
      */
@@ -362,7 +351,7 @@ class Demo extends React.Components {
      * @description 弹窗关闭的回调
      */
     afterClose(): void
-    
+  
     /**
      * @description 弹窗初始宽度 default width
      * @defaultValue 400
@@ -376,4 +365,3 @@ class Demo extends React.Components {
     height: number | % | number + px
 
 ```
-

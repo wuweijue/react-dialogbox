@@ -52,12 +52,14 @@ class DialogboxMethod implements IDialogboxMethod {
     public open(options: IOptions = this.options): IDialogbox {
         const dialogboxId = DialogboxStore.focusZIndex + 1;
         const dialogboxComponent = <Dialogbox visible={true}
+            store={DialogboxStore}
             onOk={() => {
                 this.hideDialogbox(dialogboxId)
             }}
             onCancel={() => {
                 this.hideDialogbox(dialogboxId)
             }}
+            byOpen={true}
             {...options}
         >
             {options.children}

@@ -2,7 +2,7 @@ import { Observable, createObservableObject } from './observable';
 import autorun from './autorun';
 
 export function observable(target,keyname,descriptor?):any {
-    const val = descriptor.initializer();
+    const val = descriptor && descriptor.initializer();
     if(typeof val === 'object'){
         createObservableObject(val)
     }

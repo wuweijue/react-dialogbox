@@ -3,6 +3,8 @@ import IDialogboxStore from './store/DialogboxStore.d';
 
 export interface IDialogboxProps {
 
+    byOpen?: boolean
+
     store?: IDialogboxStore
 
     isModal?: boolean
@@ -12,8 +14,6 @@ export interface IDialogboxProps {
     visible?: boolean
 
     draggable?: boolean
-
-    closable?: boolean
 
     maskClosable?: boolean
 

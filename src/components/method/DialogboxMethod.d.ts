@@ -36,6 +36,8 @@ export default class IDialogboxMethod {
 
 export interface IOptions {
 
+    isModal?: boolean
+
     containerNode?: HTMLElement 
 
     header?: boolean
@@ -45,8 +47,6 @@ export interface IOptions {
     children?: JSX.Element | string
 
     draggable?: boolean
-
-    closable?: boolean
 
     fullScreen?: boolean
 

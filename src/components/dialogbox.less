@@ -19,10 +19,17 @@ body {
     }
 
     &.@{prefix}-uncontrolable {
-        cursor: not-allowed;
+        cursor    : default;
         box-shadow: none;
-        * {
-            cursor: not-allowed !important;
+
+        .dialogbox-title,
+        .draggableSide,
+        .draggableAngle {
+            cursor: default !important;
+        }
+
+        .dialogbox-icon-extend{
+            cursor: no-drop;
         }
 
         opacity : 0.4;
@@ -35,7 +42,7 @@ body {
     }
 
     &.@{prefix}-foucs {
-        opacity: 1;
+        opacity   : 1;
         box-shadow: 0 4px 10px -4px #000000;
     }
 
@@ -46,7 +53,7 @@ body {
     border-radius   : 4px;
     background-color: white;
     position        : fixed;
-    opacity         : 0.8;
+    opacity         : 1;
     display         : flex;
     flex-direction  : column;
     top             : 40%;
@@ -360,7 +367,7 @@ body {
     }
 
     .@{prefix}-footer-wrapper {
-        height: 10px;
+        min-height: 10px;
         cursor: s-resize;
     }
 

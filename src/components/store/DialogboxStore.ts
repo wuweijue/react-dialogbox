@@ -69,6 +69,9 @@ class DialogboxStore implements IDialogboxStore {
     changeDialogboxVisible(dialogboxId, visible) {
         const { idx } = this.getDialogboxById(dialogboxId);
         this.dialogboxList[idx].visible = visible;
+        if(visible == true){
+            this.promoteZIndex(dialogboxId)
+        }
         this.changeMask();
     }
 
