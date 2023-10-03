@@ -1,0 +1,63 @@
+* {
+    box-sizing: border-box;
+}
+
+html, body, #root, .dialogDemo {
+    margin: 0;
+    height: 100%;
+}
+
+.bottom{
+    display: flex;
+    margin: 10px 0;
+    .code-wrapper{
+        width: 600px;
+    }
+    .formWrapper {
+        flex: 1;
+        margin-right: 10px;
+        background-color: white;
+        .form-title{
+            padding: 10px 0 0 10px;
+            font-size: 18px;
+            color: black;
+            font-weight: 600;
+        }
+        .ant-form{
+            
+            padding: 10px;
+    
+            .ant-row {
+               margin-bottom: 10px; 
+            }
+
+            .ant-form-item-label-left{
+                width: 220px;
+            }
+        }
+    }
+}
+
+.top2{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 10px;
+    background-color: white;
+    height: 100%;
+    >div{
+        width: 960px;    
+    }
+    overflow-y: auto;
+    .title{
+        
+        padding: 10px;
+        font-weight: 600;
+        color: black;
+        font-size: 14px;
+        width: 800px;
+    }
+    .react-monaco-editor-container{
+        margin-bottom: 10px;
+    }
+}

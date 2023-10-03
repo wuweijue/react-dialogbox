@@ -1,11 +1,12 @@
 import * as React from 'react';
-import classNames from 'classnames';
+import * as classNames from 'classnames';
 import Button from './Button';
 import { IDialogboxProps } from './Dialogbox.d';
 import './dialogbox.less';
-import { observer } from './publish-subscribe';
+import store from './store/DialogboxStore';
 
-@observer
+const { validFunction } = store
+
 class Dialogbox extends React.Component<IDialogboxProps, any> {
 
     constructor(props) {
@@ -17,11 +18,42 @@ class Dialogbox extends React.Component<IDialogboxProps, any> {
 
     isEmbedded = false; // 是否是内嵌在组件中的
 
+    dom; // 对话框最外层元素 dom
+
     init(props) {
+
+        const { width, height, marginTop, marginLeft } = this.computerLayout(props);
+
+        const { draggable = true, title } = props;
+
+        const dialogboxId = store.registerDialogbox(props);
+
+        this.dialogboxId = dialogboxId;
+
+        this.state = {
+            width,
+            height,
+            toRight: 0, // 向右的偏移量
+            toBottom: 0, // 向下的偏移量
+            isExtend: false,
+            draggable,//是否可拖拽
+            zIndex: dialogboxId, // 控制层级    
+            marginTop, //让表单初始时保持居中
+            marginLeft, //让表单初始时保持居中
+            historyWidth: width,
+            historyHeight: height,
+            title: title,
+            transition: 'none',
+            historyToBottom: 0,
+            historyToRight: 0
+        }
+    }
+
+    computerLayout(props) {
         let width = 400, height = 180;
         const { clientWidth, clientHeight } = document.body;
 
-        //将宽高由百分比或者带px单位的string转换为number
+        //将宽高由百分比或者带px单位的string转换为number 
         if (props.width && typeof props.width === 'number') {
             if (props.width > clientWidth) {
                 //宽度限制为屏幕最大宽度
@@ -29,7 +61,6 @@ class Dialogbox extends React.Component<IDialogboxProps, any> {
             } else {
                 width = props.width;
             }
-
         } else if (props.width && typeof props.width === 'string' && props.width.includes('px')) {
             if (parseInt(props.width) > clientWidth) {
                 width = clientWidth;
@@ -43,7 +74,6 @@ class Dialogbox extends React.Component<IDialogboxProps, any> {
             } else {
                 width = clientWidth * parseInt(props.width) / 100;
             }
-
         }
 
         if (props.height && typeof props.height === 'number') {
@@ -59,7 +89,6 @@ class Dialogbox extends React.Component<IDialogboxProps, any> {
                 //去除string末尾的px
                 height = parseInt(props.height);
             }
-
         } else if (props.height && typeof props.height === 'string' && props.height.includes('%')) {
             if (parseInt(props.height) > 100) {
                 height = clientHeight;
@@ -68,50 +97,24 @@ class Dialogbox extends React.Component<IDialogboxProps, any> {
             }
         }
 
-        //设置最小初始宽高
-        if (height < 120) {
-            height = 120;
-        }
-        if (width < 200) {
-            width = 200;
-        }
-
-        const { store, mask = true, visible, draggable = true, title } = props;
-
-        const dialogboxId = store.registerDialogbox(this, mask, visible);
-
-        this.dialogboxId = dialogboxId;
-
-        this.state = {
-            width: width,
-            height: height,
-            toRight: 0, // 向右的偏移量
-            toBottom: 0, // 向下的偏移量
-            isExtend: false,
-            draggable: draggable,//是否可拖拽
-            zIndex: dialogboxId, // 控制层级    
-            marginTop: 0 - 0.5 * height, //让表单初始时保持居中
-            marginLeft: 0 - 0.5 * width, //让表单初始时保持居中
-            historyWidth: width,
-            historyHeight: height,
-            title: title,
-            transition: 'none',
-            historyTop: 0 - 0.5 * height,
-            historyLeft: 0 - 0.5 * width
+        //保证宽高不小于最小值
+        return {
+            height: height < 120 ? 120 : height,
+            width: width < 120 ? 120 : width,
+            marginTop: 0 - 0.5 * height,
+            marginLeft: 0 - 0.5 * width,
         }
     }
 
-    componentWillReceiveProps(nextProps) {
+    UNSAFE_componentWillReceiveProps(nextProps) {
         const { visible } = nextProps;
         if (visible !== '' && visible !== null) {
             if (visible === false) {
-                this.afterClose();
+                this.afterClose()
             } else {
-                this.props.store.changeDialogboxVisible(this.dialogboxId, true);
+                store.changeDialogboxVisible(this.dialogboxId, true);
                 if (this.props.fullScreen) {
-                    setTimeout(() => {
-                        this.handleExtend(true)
-                    }, 500)
+                    this.handleExtend(true)
                 }
             }
         }
@@ -119,42 +122,33 @@ class Dialogbox extends React.Component<IDialogboxProps, any> {
 
     componentWillUnmount() {
         this.afterClose();
-        this.props.store.unRegisterDialogbox(this.dialogboxId);
+        store.unRegisterDialogbox(this.dialogboxId);
     }
 
     afterClose() {
         if (this.props.afterClose) {
-            this.props.afterClose();
+            validFunction(this.afterClose)
         }
         this.handleExtend(null, false)
-        this.props.store.changeDialogboxVisible(this.dialogboxId, false);
+        store.changeDialogboxVisible(this.dialogboxId, false);
     }
 
-    onOk() {
-        if (this.props.onOk) {
-            this.props.onOk();
-        }
+    onOk = () => {
+        validFunction(this.props.onOk)
     }
 
-    onCancel() {
-        if (this.props.onCancel) {
-            if(typeof this.props.onCancel == 'function'){
-                this.props.onCancel()   
-            } else {
-                console.warn('this.props.onCancel is not a function')
-            }        
-        }
+    onCancel = () => {
+        validFunction(this.props.onCancel)
     }
 
     // 用于判断是否允许控制
-    controllable() {
-        const store = this.props.store;
+    controllable = () => {
         let focusItem = store.getFocusItem();
-        if(!focusItem){
+        if (!focusItem) {
             return true
         }
         let curIsModal = this.props.isModal;
-        let foucsItemIsModal = focusItem.reactElement.props.isModal;
+        let foucsItemIsModal = focusItem.isModal;
         if ((focusItem.dialogboxId !== this.state.zIndex) && (foucsItemIsModal || curIsModal)) {
             return false // 如果被聚焦的dialogbox是个模态框，或当前选中的dialogbox是个模态框则无法操作其它模态框
         }
@@ -162,12 +156,12 @@ class Dialogbox extends React.Component<IDialogboxProps, any> {
     }
 
     isfocus() {
-        const store = this.props.store;
         return store.focusZIndex === this.state.zIndex;
     }
 
     dragMove = (e) => {
         if (!this.controllable()) return
+
         //当鼠标按下时触发
         e.stopPropagation();
         let pointLeft = e.clientX; //获取此时鼠标距离屏幕左侧的距离
@@ -178,7 +172,12 @@ class Dialogbox extends React.Component<IDialogboxProps, any> {
         let bottom = this.state.toBottom;
 
         //当鼠标按下后拖动时触发
-        document.onmousemove = (event) => {
+
+        const onmousemove = (event) => {
+            if (validFunction(this.props.beforeDragMove, event)) {
+                return
+            }
+
             //避免拖动过程中文本被选中
             window.getSelection ? window.getSelection().removeAllRanges() : (document as any).selection.empty();
 
@@ -231,7 +230,7 @@ class Dialogbox extends React.Component<IDialogboxProps, any> {
             })
         }
 
-        document.onmouseup = (event) => {
+        const onmouseup = (event) => {
             const extendMaskDOMX = document.querySelector('.dialogbox-extend-mask-x');
             const extendMaskDOMY = document.querySelector('.dialogbox-extend-mask-y');
             extendMaskDOMX.className = 'dialogbox-extend-mask-x';
@@ -247,151 +246,79 @@ class Dialogbox extends React.Component<IDialogboxProps, any> {
             if (event.clientX > document.body.clientWidth - 10) {
                 this.handleExtend('right');
             }
-            document.onmousemove = null;
-            document.onmouseup = null;
+
+            document.removeEventListener('mousemove', onmousemove);
+            document.removeEventListener('mouseup', onmouseup);
+
+            validFunction(this.props.afterDragMove, event)
         }
+
+        document.addEventListener('mousemove', onmousemove);
+        document.addEventListener('mouseup', onmouseup);
     }
 
+    dragScale = (e, x?, y?) => {
+        if (!x && !y) return;
 
-    dragScaleX(e) {
-        if (!this.controllable()) return
-        //当鼠标按下时触发
+        if (!this.controllable()) return;
+
         e.stopPropagation();
 
         let { width, toRight: right, } = this.state;
         let pointLeft = e.clientX //获取此时鼠标距离屏幕左侧的距离
-        let left = this.dialogbox.offsetLeft + right; //弹框到左边的距离
-        let pointDirection; //点击的是弹框左侧 或是 右侧
+        let left = this.dom.offsetLeft + right; //对话框到左边的距离
+        let pointDirectionX, pointDirectionY; //点击的是对话框上下左右
 
-        if (pointLeft - left <= 20 && pointLeft >= left) {
-            pointDirection = 'left';
-        } else if (width + left - pointLeft <= 20) {
-            pointDirection = 'right';
-        } else {
-            return false;
-        }
-
-        //当鼠标按下后拖动时触发
-        document.onmousemove = (event) => {
-            window.getSelection ? window.getSelection().removeAllRanges() : (document as any).selection.empty();
-            let toRight, newWidth;
-            if (pointDirection === 'left') {
-                toRight = event.clientX - pointLeft + right;
-                newWidth = width + pointLeft - event.clientX;
-                newWidth = newWidth < 200 ? 200 : newWidth;
+        if (x) {
+            if (pointLeft - left <= 20 && pointLeft >= left) {
+                pointDirectionX = 'left';
+            } else if (width + left - pointLeft <= 20) {
+                pointDirectionX = 'right';
             } else {
-                toRight = right;
-                newWidth = width + event.clientX - pointLeft;
-                newWidth = newWidth < 200 ? 200 : newWidth;
+                return;
             }
-
-            this.setState({
-                toRight,
-                width: newWidth,
-            })
-        }
-
-        document.onmouseup = () => {
-            document.onmousemove = null;
-            document.onmouseup = null;
-        }
-    }
-
-    dialogbox;//dom
-
-    dragScaleY(e) {
-        if (!this.controllable()) return
-        //当鼠标按下时触发
-        e.stopPropagation();
-
-        let { height, toBottom: bottom, } = this.state;
-        let pointTop = e.clientY //获取此时鼠标距离屏幕顶部的距离
-        let top = this.dialogbox.offsetTop + bottom; //弹框到顶部的距离
-        let pointDirection; //点击的是弹框上侧 或是 下侧
-
-        if (pointTop - top <= 20 && pointTop >= top) {
-            pointDirection = 'top';
-        } else if (height + top - pointTop <= 20) {
-            pointDirection = 'bottom';
-        } else {
-            return false;
-        }
-
-        //当鼠标按下后拖动时触发
-        document.onmousemove = (event) => {
-            window.getSelection ? window.getSelection().removeAllRanges() : (document as any).selection.empty();
-            let toBottom, newHeight;
-            if (pointDirection === 'top') {
-                toBottom = event.clientY - pointTop + bottom;
-                newHeight = height + pointTop - event.clientY;
-                newHeight = newHeight < 120 ? 120 : newHeight;
-            } else {
-                toBottom = bottom;
-                newHeight = height + event.clientY - pointTop;
-                newHeight = newHeight < 120 ? 120 : newHeight;
-            }
-
-            this.setState({
-                toBottom,
-                height: newHeight,
-            })
-        }
-
-        document.onmouseup = () => {
-            document.onmousemove = null;
-        }
-    }
-
-    dragScale(e) {
-        if (!this.controllable()) return
-        e.stopPropagation();
-        let { width, toRight: right, } = this.state;
-        let pointLeft = e.clientX //获取此时鼠标距离屏幕左侧的距离
-        let left = this.dialogbox.offsetLeft + right; //弹框到左边的距离
-        let pointDirectionX, pointDirectionY; //点击的是弹框上下左右
-
-        if (pointLeft - left <= 20 && pointLeft >= left) {
-            pointDirectionX = 'left';
-        } else if (width + left - pointLeft <= 20) {
-            pointDirectionX = 'right';
-        } else {
-            return false;
         }
 
         let { height, toBottom: bottom, } = this.state;
         let pointTop = e.clientY //获取此时鼠标距离屏幕顶部的距离
-        let top = this.dialogbox.offsetTop + bottom; //弹框到顶部的距离
+        let top = this.dom.offsetTop + bottom; //对话框到顶部的距离
 
-        if (pointTop - top <= 20 && pointTop >= top) {
-            pointDirectionY = 'top';
-        } else if (height + top - pointTop <= 20) {
-            pointDirectionY = 'bottom';
-        } else {
-            return false;
+        if (y) {
+            if (pointTop - top <= 20 && pointTop >= top) {
+                pointDirectionY = 'top';
+            } else if (height + top - pointTop <= 20) {
+                pointDirectionY = 'bottom';
+            } else {
+                return;
+            }
         }
 
-        document.onmousemove = (event) => {
+        const onmousemove = (event) => {
             window.getSelection ? window.getSelection().removeAllRanges() : (document as any).selection.empty();
-            let toRight, newWidth, toBottom, newHeight;
+            let toRight = right, newWidth = width, toBottom = bottom, newHeight = height;
 
-            if (pointDirectionX === 'left') {
-                toRight = event.clientX - pointLeft + right;
-                newWidth = width + pointLeft - event.clientX;
-                newWidth = newWidth < 200 ? 200 : newWidth;
-            } else {
-                toRight = right;
-                newWidth = width + event.clientX - pointLeft;
-                newWidth = newWidth < 200 ? 200 : newWidth;
+            if (x) {
+                if (pointDirectionX === 'left') {
+                    toRight = event.clientX - pointLeft + right;
+                    newWidth = width + pointLeft - event.clientX;
+                    newWidth = newWidth < 200 ? 200 : newWidth;
+                } else {
+                    toRight = right;
+                    newWidth = width + event.clientX - pointLeft;
+                    newWidth = newWidth < 200 ? 200 : newWidth;
+                }
             }
 
-            if (pointDirectionY === 'top') {
-                toBottom = event.clientY - pointTop + bottom;
-                newHeight = height + pointTop - event.clientY;
-                newHeight = newHeight < 120 ? 120 : newHeight;
-            } else {
-                toBottom = bottom;
-                newHeight = height + event.clientY - pointTop;
-                newHeight = newHeight < 120 ? 120 : newHeight;
+            if (y) {
+                if (pointDirectionY === 'top') {
+                    toBottom = event.clientY - pointTop + bottom;
+                    newHeight = height + pointTop - event.clientY;
+                    newHeight = newHeight < 120 ? 120 : newHeight;
+                } else {
+                    toBottom = bottom;
+                    newHeight = height + event.clientY - pointTop;
+                    newHeight = newHeight < 120 ? 120 : newHeight;
+                }
             }
 
             this.setState({
@@ -402,20 +329,27 @@ class Dialogbox extends React.Component<IDialogboxProps, any> {
             })
         }
 
-        document.onmouseup = () => {
-            document.onmousemove = null;
+        const onmouseup = () => {
+            document.removeEventListener('mousemove', onmousemove);
+            document.removeEventListener('mouseup', onmouseup);
         }
 
+        document.addEventListener('mousemove', onmousemove);
+        document.addEventListener('mouseup', onmouseup);
     }
 
     /* 全屏/还原 */
     handleExtend(direction?, value?) {
         if (!this.controllable()) return
-        let { clientWidth: width, clientHeight: height } = document.body;
-        let marginTop, marginLeft;
-        let { draggable, historyWidth, historyHeight, isExtend, toRight, historyTop, historyLeft } = this.state;
+        let { clientWidth, clientHeight } = document.body;
+        let marginTop, marginLeft, toRight, toBottom;
+        let { draggable, isExtend, historyToBottom, historyToRight, height, width, historyWidth, historyHeight } = this.state;
         if (value === false && !isExtend) return;
         if (!isExtend || value) {
+            historyWidth = width;
+            historyHeight = height;
+            width = clientWidth;
+            height = clientHeight;
             marginTop = 0;
             marginLeft = 0;
             toRight = 0;
@@ -427,48 +361,39 @@ class Dialogbox extends React.Component<IDialogboxProps, any> {
                 width *= 0.5;
                 toRight = width;
             }
-            else {
-                marginTop = 0;
-                marginLeft = 0;
-                //若当前不是全屏状态则全屏后禁止拖拽
-            }
-
         } else {
             //从全屏状态恢复为原来的状态
             draggable = this.props.draggable === false ? false : true;
             width = historyWidth;
             height = historyHeight;
-            marginTop = historyTop;
-            marginLeft = historyLeft;
-            toRight = 0;
+            toRight = historyToRight;
+            toBottom = historyToBottom;
+            marginTop = 0 - 0.5 * height;
+            marginLeft = 0 - 0.5 * width;
         }
         this.setState({
             historyWidth: this.state.width,
             historyHeight: this.state.height,
-            toRight,
-            toBottom: 0,
-            draggable,
             marginTop,
             marginLeft,
-            historyTop: this.state.marginTop,
-            historyLeft: this.state.marginLeft,
+            toRight,
+            toBottom,
+            draggable,
+            historyToBottom: this.state.toBottom,
+            historyToRight: this.state.toRight,
             isExtend: !isExtend,
             width,
             height,
-            transition: '0.5s'
+            transition: '0.4s'
         })
-
-        // setTimeout(() => {
-        //     this.setState({
-        //         transition: 'none',
-        //     })
-        // }, 500)
+        setTimeout(() => this.setState({
+            transition: 'none'
+        }), 400)
     }
 
     //聚焦
     handleFocus = () => {
         if (this.props.isModal) return;
-        const store = this.props.store;
         const { dialogboxList } = store;
         const focusZIndex = store.focusZIndex;
         if (dialogboxList.length > 1 && this.state.zIndex < focusZIndex) {
@@ -482,28 +407,29 @@ class Dialogbox extends React.Component<IDialogboxProps, any> {
     componentDidMount() {
         const { byOpen, fullScreen } = this.props;
         // 如果是通过open方法打开，需要单独判断是否初始全屏
-        if(byOpen && fullScreen){
-            // 加入计时器是避免和入场动画冲突
-            setTimeout(()=>{
-                this.handleExtend(true)
-            },600)    
+        if (byOpen && fullScreen) {
+            this.handleExtend(true)
         }
-        setTimeout(() => {
-            // 注册点击阴影触发onCancel事件
-            this.isEmbedded = !!!document.getElementById('dialogbox-wrapper-' + this.dialogboxId)
-            if (!this.isEmbedded) {
-                document.getElementById('dialogbox-root').addEventListener('click', this.handleMaskClick)
-            } else {
-                document.querySelector('.dialogbox-mask').addEventListener('click', (e) => {
-                    this.handleMaskClick(e)
-                })
-            }
-        })
+
+        // 注册点击阴影触发onCancel事件
+        this.isEmbedded = !!!document.getElementById('dialogbox-wrapper-' + this.dialogboxId)
+        if (!this.isEmbedded) {
+            document.getElementById('dialogbox-root').addEventListener('click', this.handleMaskClick)
+        } else {
+            document.querySelector('.dialogbox-mask').addEventListener('click', this.handleMaskClick)
+        }
     }
 
     // 当阴影点击时触发的事件
     handleMaskClick = (e) => {
-        const { maskClosable, store } = this.props;
+
+        const { maskClosable, beforeMaskClick, afterMaskClick } = this.props;
+
+        // 此处接收一个钩子作为参数，若存在返回值且返回值为 true 则跳过后续操作
+        if (validFunction(beforeMaskClick, e)) {
+            return
+        }
+
         const dialogboxList = store.dialogboxList;
 
         if (!maskClosable) {
@@ -521,18 +447,45 @@ class Dialogbox extends React.Component<IDialogboxProps, any> {
         }
 
         this.onCancel();
+
+        validFunction(afterMaskClick, e)
+    }
+
+    headerRender() {
+        const { header = true, headerStyle, title } = this.props;
+        const { draggable } = this.state;
+
+        return header && <div className='dialogbox-header' style={headerStyle}>
+            <div className='dialogbox-title'/* 对话框拖动事件 */
+                onDoubleClick={(e) => {
+                    e.stopPropagation();
+                    this.handleFocus();
+                    this.handleExtend();
+                }}
+                onMouseDown={(e) => {
+                    this.handleFocus()
+                    draggable && this.dragMove(e)
+                }}>
+                <span className='dialogbox-title-content'
+                    onDoubleClick={(e) => {
+                        e.stopPropagation();
+                    }}
+                    onMouseDown={(e) => {
+                        e.stopPropagation();
+                    }}>{title}</span>
+            </div>
+
+            {/* 右上角功能图标 */}
+            {this.btnListRender()}
+        </div>
     }
 
     footerRender = () => {
-        const { footer, okText, cancelText } = this.props;
-        const { draggable = true } = this.state;
+        const { footer, okText, cancelText, footerStyle } = this.props;
 
-        if (typeof footer == 'string' || (Object.prototype.toString.call(footer) === '[object Object]' && (footer as JSX.Element).type)) {
+        if (typeof footer == 'string' || React.isValidElement(footer)) {
             /* 如果是一个react组件 */
-            return <div className='dialogbox-footer-wrapper' onMouseDown={(e) => {
-                /* 触发高度缩放事件 */
-                draggable && this.dragScaleY(e)
-            }}>
+            return <div className='dialogbox-footer-wrapper'>
                 {footer}
             </div>
         }
@@ -543,23 +496,22 @@ class Dialogbox extends React.Component<IDialogboxProps, any> {
 
         return (
             <div
+                style={footerStyle}
                 className='dialogbox-footer'
-                onMouseDown={(e) => {
-                    /* 触发高度缩放事件 */
-                    draggable && this.dragScaleY(e)
-                }}>
-
+            >
                 <div className='dialogbox-footer-btnList'>
-
-                    <Button dialogboxType={this.props.dialogboxStyle} className='dialogbox-footer-btn cancel-btn' onClick={
-                        () => this.onCancel()
-                    }>
+                    <Button
+                        dialogboxType={'windows'}
+                        className='dialogbox-footer-btn cancel-btn'
+                        onClick={this.onCancel}>
                         {cancelText || '取消'}
                     </Button>
 
-                    <Button dialogboxType={this.props.dialogboxStyle} btnType='primary' className='dialogbox-footer-btn ok-btn' onClick={
-                        () => this.onOk()
-                    }>
+                    <Button
+                        dialogboxType={'windows'}
+                        btnType='primary'
+                        className='dialogbox-footer-btn ok-btn'
+                        onClick={this.onOk}>
                         {okText || '确认'}
                     </Button>
                 </div>
@@ -567,68 +519,68 @@ class Dialogbox extends React.Component<IDialogboxProps, any> {
         )
     }
 
-    draggableAngleRender() {
+    angleRender() {
         return ['right-bottom', 'right-top', 'left-bottom', 'left-top'].map(item => {
-            return <div key={item} className={classNames('draggableAngle', item)} onMouseDown={(e) => this.dragScale(e)}></div>
+            return <div key={item} className={classNames('draggableAngle', item)} onMouseDown={(e) => this.dragScale(e, true, true)}></div>
         })
     }
 
-    draggableSideRender() {
+    sideRender() {
         return ['right', 'top', 'bottom', 'left'].map(item => {
             return <div key={item} className={classNames('draggableSide', item)} onMouseDown={(e) => {
-                item === 'top' || item === 'bottom' ? this.dragScaleY(e) : this.dragScaleX(e)
+                item === 'top' || item === 'bottom' ? this.dragScale(e, false, true) : this.dragScale(e, true, false)
             }}></div>
         })
     }
 
     btnListRender() {
         return <div className='dialogbox-header-btnList'>
-            {<>
-                <div
-                    className={classNames('dialogbox-header-btn btn-extend')}
-                    onClick={
-                        () => this.handleExtend()
-                    }
-                >
-                    <i className='dialogbox-icon dialogbox-icon-extend' ></i>
-                </div>
+            <div
+                className={'dialogbox-header-btn btn-extend'}
+                onClick={
+                    () => this.handleExtend()
+                }
+            >
+                <i className='dialogbox-icon dialogbox-icon-extend' ></i>
+            </div>
 
-                <div
-                    className='dialogbox-header-btn btn-close'
-                    onClick={
-                        (e) => {
-                            if (!this.controllable()) {
-                                e.preventDefault()
-                            } else {
-                                this.onCancel()
-                            }
+            <div
+                className='dialogbox-header-btn btn-close'
+                onClick={
+                    (e) => {
+                        if (!this.controllable()) {
+                            e.preventDefault()
+                        } else {
+                            this.onCancel()
                         }
-                    }>
-                    <i className='dialogbox-icon dialogbox-icon-close' ></i>
-                </div>
-            </>}
+                    }
+                }>
+                <i className='dialogbox-icon dialogbox-icon-close'></i>
+            </div>
         </div>
     }
 
     render() {
-        const { className: propsClassName, title, bodyStyle, dialogboxStyle = 'windows', visible, header = true } = this.props;
+        const { className: propsClassName, visible } = this.props;
         let { isExtend, draggable, toRight, toBottom, transition, width, height, zIndex, marginTop, marginLeft } = this.state;
         const className = classNames('dialogbox', 'dialogbox-animation-in',
             { 'dialogbox-extendStatus': isExtend, [propsClassName]: propsClassName },
-            { [dialogboxStyle]: dialogboxStyle },
             { 'dialogbox-uncontrolable': !this.controllable() },
             { 'dialogbox-foucs': this.isfocus() }
         )
-        let transformProps = {}
+
+        let transformProps = {
+            transform: ''
+        }
         if (toRight || toBottom) {
             transformProps = {
-                transform: 'translate(' + toRight + 'px,' + toBottom + 'px)'
+                transform: 'translate(' + (toRight || 0) + 'px,' + (toBottom || 0) + 'px)'
             }
         }
 
         return (
             <div
-                ref={(dialogbox) => this.dialogbox = dialogbox}
+                ref={(dialogbox) => this.dom = dialogbox}
                 id={'dialogbox-' + this.dialogboxId}
                 className={className}
                 onClick={() => { this.handleFocus() }}
@@ -638,43 +590,24 @@ class Dialogbox extends React.Component<IDialogboxProps, any> {
                     }
                 }}
                 style={{
-                    ...bodyStyle,
                     display: visible ? 'flex' : 'none',
                     width: width + 'px',
                     height: height + 'px',
                     zIndex: zIndex,
                     marginTop: marginTop,
                     marginLeft: marginLeft,
-                    transition: transition,
-                    ...transformProps
+                    transition,
+                    ...transformProps,
                 }}>
-                {this.draggableAngleRender()}
-                {this.draggableSideRender()}
-                {header && <div className='dialogbox-header'>
-
-                    <div className='dialogbox-title'/* 弹窗拖动事件 */
-                        onDoubleClick={(e) => {
-                            e.stopPropagation();
-                            this.handleFocus();
-                            this.handleExtend();
-                        }}
-                        onMouseDown={(e) => {
-                            this.handleFocus()
-                            draggable && this.dragMove(e)
-                        }}>
-                        <span className='dialogbox-title-content'
-                            onDoubleClick={(e) => {
-                                e.stopPropagation();
-                            }}
-                            onMouseDown={(e) => {
-                                e.stopPropagation();
-                            }}>{title}</span>
-                    </div>
-
-                    {/* 右上角功能图标 */}
-                    {this.btnListRender()}
-                </div>}
-
+                {
+                    this.angleRender()
+                }
+                {
+                    this.sideRender()
+                }
+                {
+                    this.headerRender()
+                }
                 <div
                     className='dialogbox-body dialogbox-scroll'
                 >

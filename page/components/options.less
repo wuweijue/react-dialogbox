@@ -1,0 +1,40 @@
+.options {
+    .top{
+        display: flex;
+        justify-content: center;
+    }
+    .bottom {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .form-wrapper {
+        margin-right: 80px;
+        .ant-form-item {
+            margin-bottom: 8px;
+
+            .ant-form-item-label {
+                width: 220px;
+            }
+        }
+        width: 600px;
+    }
+
+    .code-wrapper {
+        width: 480px;
+        padding-right: 20px;
+    }
+}
+
+@media (max-width: 1200px) {  
+    .bottom {
+        .form-wrapper {  
+            margin-right: 0;  
+        } 
+        .code-wrapper {
+            width: 600px;
+        } 
+    }
+    
+}
