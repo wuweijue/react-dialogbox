@@ -1,0 +1,68 @@
+{
+  "name": "react-dialogbox",
+  "version": "2.0.0",
+  "main": "lib/index.js",
+  "author": "wuweijue",
+  "homepage": "https://wuweijue.github.io/#/dialogbox",
+  "description": "A dialogbox UI and React components implementation",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wuweijue/react-dialogbox"
+  },
+  "license": "MIT",
+  "keywords": [
+    "react",
+    "dialog",
+    "dialogbox",
+    "component",
+    "components",
+    "react-component",
+    "drag",
+    "draggable",
+    "typescript"
+  ],
+  "scripts": {
+    "dev": "npx webpack --watch --mode development",
+    "build": "npx webpack --mode production"
+  },
+  "dependencies": {
+    "classnames": "^2.3.2"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.10.4",
+    "@babel/plugin-proposal-class-properties": "^7.18.6",
+    "@babel/plugin-proposal-decorators": "^7.18.2",
+    "@babel/preset-env": "^7.22.20",
+    "@babel/preset-react": "^7.10.4",
+    "@babel/preset-typescript": "^7.16.7",
+    "@hot-loader/react-dom": "^16.13.0",
+    "@types/react": "^16.8.4",
+    "@types/react-dom": "^16.8.4",
+    "autoprefixer": "^10.2.6",
+    "babel-loader": "^8.1.0",
+    "babel-plugin-transform-decorators-legacy": "^1.3.5",
+    "css-hot-loader": "^1.4.4",
+    "css-loader": "^3.6.0",
+    "declaration-bundler-webpack-plugin": "^1.0.3",
+    "declaration-bundler-webpack4-plugin": "^1.0.6-beta.2",
+    "html-webpack-plugin": "^4.3.0",
+    "less": "^4.1.1",
+    "less-loader": "^7.1.1",
+    "postcss": "^8.3.0",
+    "postcss-loader": "^5.3.0",
+    "react": "^16.8.4",
+    "react-dom": "^16.8.4",
+    "source-map": "^0.7.3",
+    "style-loader": "^1.2.1",
+    "typescript": "^4.2.4",
+    "webpack": "^5.38.1",
+    "webpack-cli": "^4.7.2",
+    "webpack-dev-server": "^3.11.2",
+    "webpack-merge": "^5.0.9",
+    "webpack-node-externals": "^3.0.0",
+    "yarn": "^1.22.18"
+  },
+  "files": [
+    "dist"
+  ]
+}
