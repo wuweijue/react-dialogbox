@@ -1,7 +1,7 @@
 {
   "name": "react-dialogbox",
-  "version": "2.0.0",
-  "main": "lib/index.js",
+  "version": "2.0.2",
+  "main": "dist/index.js",
   "author": "wuweijue",
   "homepage": "https://wuweijue.github.io/#/dialogbox",
   "description": "A dialogbox UI and React components implementation",
