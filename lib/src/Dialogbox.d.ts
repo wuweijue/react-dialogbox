@@ -1,11 +1,8 @@
 import * as React from 'react';
-import IDialogboxStore from './store/DialogboxStore.d';
 
 export type IDialogboxProps = {
 
     byOpen?: boolean
-
-    store?: IDialogboxStore
 
     isModal?: boolean
 

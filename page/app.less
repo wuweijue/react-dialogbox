@@ -5,14 +5,13 @@
 html, body, #root, .dialogDemo {
     margin: 0;
     height: 100%;
+    
 }
 
 .bottom{
     display: flex;
     margin: 10px 0;
-    .code-wrapper{
-        width: 600px;
-    }
+    
     .formWrapper {
         flex: 1;
         margin-right: 10px;
@@ -61,3 +60,54 @@ html, body, #root, .dialogDemo {
         margin-bottom: 10px;
     }
 }
+
+.dark {
+    * {
+        &::-webkit-scrollbar-thumb {
+            border-radius: 2px;
+            /*滚动条里面小方块*/
+            background: rgba(255, 255, 255, 0.4);
+
+            &:hover {
+                background: rgba(255, 255, 255, 0.65);
+            }
+        }
+
+        &::-webkit-scrollbar-track {
+            /*滚动条里面轨道*/
+            background: black;
+        }
+
+        &::-webkit-scrollbar {
+            /*滚动条整体样式*/
+            width: 8px;
+            height: 4px;
+        }
+
+    }
+}
+
+* {
+    &::-webkit-scrollbar-thumb {
+        border-radius: 2px;
+        /*滚动条里面小方块*/
+        background: rgba(24, 144, 255, 0.5);
+    
+        &:hover {
+            background: #1c56d1;
+        }
+    }
+    
+    &::-webkit-scrollbar-track {
+        height: 4px;
+        /*滚动条里面轨道*/
+        background: #F0f0f0;
+    }
+    
+    &::-webkit-scrollbar {
+        /*滚动条整体样式*/
+        width: 4px;
+        height: 4px;
+    }
+}
+

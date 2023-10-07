@@ -9,7 +9,7 @@ type OptionsType = {
     [key: string]: any
 }
 
-const Options = () => {
+const Options = (props) => {
     const [state, setState] = useState<OptionsType>({
         title: 'react-dialogbox',
         mask: true,
@@ -24,7 +24,7 @@ const Options = () => {
         okText: '',
         cancelText: '',
         footer: null,
-        children: 'this is a dialog box',
+        children: '对话框内容',
     })
 
     const { title, footerNum, footerContent, mask, maskClosable, width, height, header, draggable, okText, cancelText, children, fullScreen } = state;
@@ -40,29 +40,31 @@ const Options = () => {
 
     return <div className="options">
         <div className="top">
-            <Button type='primary' onClick={() => {
-                const { dialogboxId } = open({
-                    onCancel() {
-                        hideDialogbox(dialogboxId)
-                    },
-                    isModal: true,
-                    title,
-                    mask,
-                    maskClosable,
-                    width,
-                    height,
-                    fullScreen,
-                    header,
-                    footer: footerNum === 2 ? false : (footerNum === 1 ? true : footerContent),
-                    draggable,
-                    children
-                })
-            }}>点击出现对话框</Button>
+            <Button type='primary'
+                onClick={() => {
+                    const { dialogboxId } = open({
+                        onCancel() {
+                            hideDialogbox(dialogboxId)
+                        },
+                        isModal: true,
+                        title,
+                        mask,
+                        maskClosable,
+                        width,
+                        height,
+                        fullScreen,
+                        header,
+                        footer: footerNum === 2 ? false : (footerNum === 1 ? true : footerContent),
+                        draggable,
+                        children
+                    })
+                }}
+            >点击出现对话框</Button>
         </div>
 
         <div className="bottom">
             <div className='form-wrapper'>
-                <h3 className='form-title'>调试面板</h3>
+                <h3 className='form-title'>属性面板</h3>
                 <Form labelAlign='left'>
                     <Form.Item label="对话框标题 (title)">
                         <Input value={title} onChange={(e) => { setState({ ...state, ...{ title: e.target.value } }) }} />
@@ -87,13 +89,13 @@ const Options = () => {
                         }} />
                     </Form.Item>
 
-                    <Form.Item label="设置宽度 (width)" tooltip='最值区间为[浏览器可视宽度,200]，超出最值部分自动调整，支持百分比'>
+                    <Form.Item label="设置宽度 (width)" tooltip='取值区间：[ 200px, 浏览器可视宽度 ]，超出最值部分自动调整，支持百分比'>
                         <InputNumber value={width} onChange={(value) => {
                             setState({ ...state, ...{ width: Number(value) } })
                         }} />
                     </Form.Item>
 
-                    <Form.Item label="设置高度 (height)" tooltip='最值区间为[浏览器可视高度,120]，超出最值部分自动调整，支持百分比'>
+                    <Form.Item label="设置高度 (height)" tooltip='取值区间：[ 120px, 浏览器可视高度 ]，超出最值部分自动调整，支持百分比'>
                         <InputNumber value={height} onChange={(value) => {
                             setState({ ...state, ...{ height: Number(value) } })
                         }} />
@@ -123,7 +125,7 @@ const Options = () => {
                         }} />
                     </Form.Item>
 
-                    <Form.Item label="是否展示底部 (footer)" tooltip='footer的取值：当值为布尔值时，true为显示，false为隐藏'>
+                    <Form.Item label="是否展示底部 (footer)" tooltip='当值为布尔类型时，true 为显示默认的内容，false 为隐藏'>
                         <Radio.Group value={footerNum} onChange={(e => {
                             setState({ ...state, ...{ footerNum: e.target.value, footer: e.target.value === 2 ? false : (e.target.value === 1 ? null : footerContent) } })
                         })}>
@@ -133,7 +135,7 @@ const Options = () => {
                         </Radio.Group>
                     </Form.Item>
 
-                    <Form.Item label="自定义底部内容 (footer)" tooltip='footer的取值：当值为字符串或者jsx时，值为显示的内容'>
+                    <Form.Item label="自定义底部内容 (footer)" tooltip='当值为字符串或者 jsx 类型时，值即是显示的内容'>
                         <Input disabled={footerNum !== 3} value={footerContent} onChange={(e) => {
                             setState({ ...state, ...{ footerContent: e.target.value, footer: footerContent } })
                         }} />
@@ -157,9 +159,9 @@ const Options = () => {
                 <h3>源码编辑</h3>
                 <MonacoEditor
                     width="600"
-                    height={400}
+                    height='512'
                     language="json"
-                    theme="vs"
+                    theme={props.theme === 'dark' ? "vs-dark" : 'vs'}
                     options={{
                         autoIndent: 'brackets',//自动布局
                         automaticLayout: true,
@@ -170,7 +172,7 @@ const Options = () => {
                     }}
                     onChange={handleEditorChange}
                     value={formatJson(JSON.stringify(state))}
-                    // editorDidMount={editorDidMountHandle}
+                // editorDidMount={editorDidMountHandle}
                 />
             </div>
         </div >

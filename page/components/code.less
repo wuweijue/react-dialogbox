@@ -2,22 +2,37 @@
     .install {
         padding: 20px;
     }
+
     .embedded {
         padding: 20px;
+
         .embedded-content {
             display: flex;
             flex-wrap: wrap;
 
             .left {
-                padding: 20px;
+                padding: 0 20px;
                 flex: 1;
             }
 
             .right {
-                padding: 20px;
+                padding: 0 20px;
                 flex: 1;
             }
-        }
 
+            .left,
+            .right {
+                display: flex;
+                flex-direction: column;
+
+                pre {
+                    flex: 1;
+                }
+            }
+        }
+    }
+
+    pre {
+        border-radius: 8px;
     }
 }

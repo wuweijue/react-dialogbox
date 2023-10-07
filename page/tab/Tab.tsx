@@ -67,7 +67,7 @@ class Tab extends React.Component<ITabViewProps, any> {
                 <div className='tab-bar-list'>
                     {
                         tabList.map((item, idx) => {
-                            return <div className='tab-bar-item' key={item.key || idx}>
+                            return <div className={classNames('tab-bar-item', { 'active': activeKey === item.key })} key={item.key || idx}>
                                 <div className={classNames('tab-bar-item-active-tip', { 'active': activeKey === item.key })}></div>
                                 <div className='tab-bar-item-title' onClick={() => {
                                     onChange && onChange(item.key)

@@ -4,6 +4,7 @@ import Button from './Button';
 import { IDialogboxProps } from './Dialogbox.d';
 import './dialogbox.less';
 import { useEffect, useMemo, useRef, useReducer, useState } from 'react';
+import store from './store/DialogboxStore';
 
 const validFunction = (callback, event?) => {
     if (!callback || typeof callback !== 'function') {
@@ -76,7 +77,7 @@ const Dialogbox = (props: IDialogboxProps) => {
 
     const { width, height, marginTop, marginLeft } = computerLayout;
 
-    const { store,
+    const { 
         mask = true,
         visible,
         draggable = true,

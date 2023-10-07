@@ -1,7 +1,7 @@
 import './code.less';
 import React from 'react';
 import SyntaxHighlighter from 'react-syntax-highlighter';
-import { docco } from 'react-syntax-highlighter/dist/esm/styles/hljs';
+import * as codeStyle from 'react-syntax-highlighter/dist/esm/styles/hljs';
 
 const EmbeddedClassComponentCode = (
     `
@@ -14,18 +14,20 @@ const EmbeddedClassComponentCode = (
             visible: false
         }
 
-        show = ()=> {
+        show = () => {
             this.setState({ visible: true })
         }
 
-        hide = ()=> {
+        hide = () => {
             this.setState({ visible: false })
         }
 
         render() {
             return <div>
                 <button onClick={this.showDialogbox}> react-dialogbox </button>
-                <Dialogbox visible={this.state.visible} onCancel={this.hideDialogbox} />
+                <Dialogbox visible={this.state.visible} onCancel={this.hideDialogbox} >
+                    对话框内容
+                </Dialogbox>
             </div>
         }
     }
@@ -42,7 +44,9 @@ const EmbeddedFunctionComponentCode = (
 
         return <div>
             <button onClick={() => setVisible(true)}> react-dialogbox </button>
-            <Dialogbox visible={visible} onCancel={() => setVisible(true)} />
+            <Dialogbox visible={visible} onCancel={() => setVisible(true)} >
+                对话框内容
+            </Dialogbox>
         </div>        
     }
 
@@ -58,18 +62,18 @@ const showDialogboxClassComponentCode = (
 
         dialogboxInstance
 
-        close = ()=> {
-            // 利用实例关闭 close this dialogbox by his instance
+        close = () => {
+            // 利用实例关闭
             this.dialogboxInstance.close(); 
 
-            // 通过 hideDialogbox 方法关闭 close the dialog box using the hideDialogbox method 
+            // 通过 hideDialogbox 方法关闭
             hideDialogbox(this.dialogboxInstance.dialogboxId);
 
-            // 上述二选一 Either of the above
+            // 上述二选一
         }
 
-        show = ()=> {
-            // 方法返回一个实例对象 return a instance of Dialogbox
+        show = () => {
+            // 方法返回一个实例对象
             this.dialogboxInstance = showDialogbox(<Dialogbox 
                 title='showDialogbox'
                 visible={true}
@@ -93,18 +97,18 @@ const showDialogboxFunctionComponentCode = (
     const App = () => {
         const dialogboxInstance = useRef();
 
-        const close = ()=> {
-            // 利用实例关闭 close this dialogbox by his instance
+        const close = () => {
+            // 利用实例关闭 
             dialogboxInstance.current.close();
 
-            // 通过 hideDialogbox 方法关闭 close the dialog box using the hideDialogbox method 
+            // 通过 hideDialogbox 方法关闭 
             hideDialogbox(dialogboxInstance.current.dialogboxId);
 
-            // 上述二选一 Either of the above 
+            // 上述二选一
         }
 
         const show = () => {
-            // 方法返回一个实例对象 return a instance of Dialogbox
+            // 方法返回一个实例对象
             dialogboxInstance.current = showDialogbox(<Dialogbox 
                 title='showDialogbox'
                 visible={true}
@@ -127,23 +131,22 @@ const openClassComponentCode = (
 
         dialogboxInstance
 
-        close = ()=> {
-            // 利用实例关闭 close this dialogbox by his instance
-            this.dialogboxInstance.close(); 
-
-            // 通过 hideDialogbox 方法关闭 close the dialog box using the hideDialogbox method 
-            hideDialogbox(this.dialogboxInstance.dialogboxId);
-
-            // 上述二选一 Either of the above
-        }
-
-        show = ()=> {
-            // 接收 options 作为参数，options 基本等同于 props
-            // 方法返回一个实例对象 return a instance of Dialogbox
+        show = () => {
+            // 接收 options 作为参数，options 基本等同于 props，方法返回一个实例对象
             this.dialogboxInstance = open({
                 title: 'showDialogbox',
                 onCancel: this.dialogboxInstance.close,
             })
+        }
+
+        close = () => {
+            // 利用实例关闭
+            this.dialogboxInstance.close(); 
+
+            // 通过 hideDialogbox 方法关闭 
+            hideDialogbox(this.dialogboxInstance.dialogboxId); 
+
+            // 上述二选一 
         }
 
         render(){
@@ -162,23 +165,22 @@ const openFunctionComponentCode = (
     const App = () => {
         const dialogboxInstance = useRef();
 
-        const show = ()=> {
-            // 接收 options 作为参数，options 基本等同于 props
-            // 方法返回一个实例对象 return a instance of Dialogbox
+        const show = () => {
+            // 接收 options 作为参数，options 基本等同于 props，方法返回一个实例对象
             dialogboxInstance.current = open({
                 title: 'showDialogbox',
                 onCancel: dialogboxInstance.current.close,
             })
         }
 
-        const close = ()=> {
-            // 利用实例关闭 close this dialogbox by his instance
-            dialogboxInstance.current.close();
+        const close = () => {
+            // 利用实例关闭
+            dialogboxInstance.current.close(); 
 
-            // 通过 hideDialogbox 方法关闭 close the dialog box using the hideDialogbox method 
-            hideDialogbox(dialogboxInstance.current.dialogboxId);
+            // 通过 hideDialogbox 方法关闭 
+            hideDialogbox(dialogboxInstance.current.dialogboxId); 
 
-            // 上述二选一 Either of the above 
+            // 上述二选一
         }
 
         return <button onClick={show}> react-dialogbox </button>      
@@ -210,34 +212,34 @@ const setConfigCode = (
     import { setOption } from 'react-dialogbox';
 
     setOption({
-        // 设置 Dialogbox 在哪渲染
-        dialogboxRoot: getElementById('dialogbox-root')
+        containerNode: getElementById('dialogbox-root') // 设置 Dialogbox 在哪个 DOM 元素内渲染
     })
 
 `
 )
 
-const CodeView = () => {
+const CodeView = (props) => {
+    const style = props.theme === 'dark' ? codeStyle.vs2015 : codeStyle.xcode
     return <div className="codeView">
         <div className='install'>
-            <h3 className='title'>安装 Install</h3>
-            <SyntaxHighlighter language="shell" style={docco}>
+            <h3 className='title'>安装</h3>
+            <SyntaxHighlighter language="shell" style={style}>
                 {installCode}
             </SyntaxHighlighter>
         </div>
 
         <div className="embedded">
-            <h3>组件内嵌 Embedded</h3>
+            <h3>组件内嵌</h3>
             <div className="embedded-content">
                 <div className="left">
-                    <h4>类组件 ClassComponent</h4>
-                    <SyntaxHighlighter language="javascript" style={docco}>
+                    <h4>类组件</h4>
+                    <SyntaxHighlighter language="javascript" style={style}>
                         {EmbeddedClassComponentCode}
                     </SyntaxHighlighter>
                 </div>
                 <div className="right">
-                    <h4>函数组件 FunctionComponent</h4>
-                    <SyntaxHighlighter language="javascript" style={docco}>
+                    <h4>函数组件</h4>
+                    <SyntaxHighlighter language="javascript" style={style}>
                         {EmbeddedFunctionComponentCode}
                     </SyntaxHighlighter>
                 </div>
@@ -248,14 +250,14 @@ const CodeView = () => {
             <h3>showDialogbox Api</h3>
             <div className="embedded-content">
                 <div className="left">
-                    <h4>类组件 ClassComponent</h4>
-                    <SyntaxHighlighter language="javascript" style={docco}>
+                    <h4>类组件</h4>
+                    <SyntaxHighlighter language="javascript" style={style}>
                         {showDialogboxClassComponentCode}
                     </SyntaxHighlighter>
                 </div>
                 <div className="right">
-                    <h4>函数组件 FunctionComponent</h4>
-                    <SyntaxHighlighter language="javascript" style={docco}>
+                    <h4>函数组件</h4>
+                    <SyntaxHighlighter language="javascript" style={style}>
                         {showDialogboxFunctionComponentCode}
                     </SyntaxHighlighter>
                 </div>
@@ -266,14 +268,14 @@ const CodeView = () => {
             <h3>open Api</h3>
             <div className="embedded-content">
                 <div className="left">
-                    <h4>类组件 ClassComponent</h4>
-                    <SyntaxHighlighter language="javascript" style={docco}>
+                    <h4>类组件</h4>
+                    <SyntaxHighlighter language="javascript" style={style}>
                         {openClassComponentCode}
                     </SyntaxHighlighter>
                 </div>
                 <div className="right">
-                    <h4>函数组件 FunctionComponent</h4>
-                    <SyntaxHighlighter language="javascript" style={docco}>
+                    <h4>函数组件</h4>
+                    <SyntaxHighlighter language="javascript" style={style}>
                         {openFunctionComponentCode}
                     </SyntaxHighlighter>
                 </div>
@@ -282,14 +284,14 @@ const CodeView = () => {
 
         <div className='install'>
             <h3 className='title'>关闭所有对话框 close all dialogboxes </h3>
-            <SyntaxHighlighter language="javascript" style={docco}>
+            <SyntaxHighlighter language="javascript" style={style}>
                 {hideAllCode}
             </SyntaxHighlighter>
         </div>
 
         <div className='install'>
             <h3 className='title'>设置全局配置 </h3>
-            <SyntaxHighlighter language="javascript" style={docco}>
+            <SyntaxHighlighter language="javascript" style={style}>
                 {setConfigCode}
             </SyntaxHighlighter>
         </div>

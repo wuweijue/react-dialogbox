@@ -19,12 +19,15 @@ class DialogboxMethod implements IDialogboxMethod {
         if (!dialogboxRoot) {
             dialogboxRoot = document.createElement('div');
             dialogboxRoot.setAttribute('id', 'dialogbox-root');
-            containerNode.appendChild(dialogboxRoot);
-            
+            containerNode.appendChild(dialogboxRoot);                     
+        }
+
+        const maskX = document.querySelector('.dialogbox-extend-mask-x')
+        if(!maskX){
             const extendMaskDOMX = document.createElement('div');
             const extendMaskDOMY = document.createElement('div');
             extendMaskDOMX.className = 'dialogbox-extend-mask-x';
-            extendMaskDOMY.className = 'dialogbox-extend-mask-y';           
+            extendMaskDOMY.className = 'dialogbox-extend-mask-y'; 
             document.body.appendChild(extendMaskDOMX);
             document.body.appendChild(extendMaskDOMY);
         }
@@ -60,7 +63,6 @@ class DialogboxMethod implements IDialogboxMethod {
         const dialogboxId = DialogboxStore.focusZIndex + 1;
         const dialogboxComponent = <Dialogbox
             visible={true}
-            store={DialogboxStore}
             onOk={() => {
                 this.hideDialogbox(dialogboxId)
             }}

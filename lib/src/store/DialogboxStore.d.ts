@@ -1,9 +1,10 @@
-interface dialogboxItem {
+export interface dialogboxItem {
     dialogboxId: number,
     isModal: boolean,
     onOk(): void
     onCancel(): void,
     visible: boolean,
+    mask: boolean
 }
 
 export default class IDialogboxStore {
@@ -20,7 +21,7 @@ export default class IDialogboxStore {
 
     promoteZIndex(dialogboxId: number): void
 
-    findItemById(dialogboxId: number): JSX.Element
+    findItemById(dialogboxId: number): dialogboxItem
 
     changeDialogboxVisible(dialogboxId: number, visible: boolean): void
 

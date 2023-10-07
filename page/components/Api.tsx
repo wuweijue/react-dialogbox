@@ -2,14 +2,14 @@ import { Form, Table } from 'antd';
 import React from 'react';
 import './api.less'
 
-
 const Api = () => {
     return <div className="api">
         <Form>
             <Form.Item>
                 <Table
+                    rowKey={record => record.prop}
                     pagination={false}
-                    title={() => <h3>Dialogbox component props</h3>}
+                    title={() => <h3>Dialogbox 组件的 props</h3>}
                     columns={[
                         {
                             title: '参数 param',
@@ -79,6 +79,12 @@ const Api = () => {
                             dafaultValue: '200',
                         },
                         {
+                            prop: 'className',
+                            description: '为 Dialogbox 最外层元素添加额外的 className',
+                            type: 'string',
+                            dafaultValue: '',
+                        },
+                        {
                             prop: 'fullScreen',
                             description: '初始时是否全屏',
                             type: 'boolean',
@@ -95,6 +101,24 @@ const Api = () => {
                             description: '是否展示头部',
                             type: 'boolean',
                             dafaultValue: 'true',
+                        },
+                        {
+                            prop: 'headerStyle',
+                            description: '为 Dialogbox 的 header 添加额外的 style',
+                            type: 'React.CSSProperties',
+                            dafaultValue: '',
+                        },
+                        {
+                            prop: 'bodyStyle',
+                            description: '为 Dialogbox 的 body 添加额外的 style',
+                            type: 'React.CSSProperties',
+                            dafaultValue: '',
+                        },
+                        {
+                            prop: 'footerStyle',
+                            description: '为 footer 添加额外的 style',
+                            type: 'React.CSSProperties',
+                            dafaultValue: '',
                         },
                         {
                             prop: 'isModal',
@@ -192,56 +216,58 @@ const Api = () => {
             </Form.Item>
             <Form.Item>
                 <Table
+                    rowKey={record=>record.prop}
                     pagination={false}
-                    title={() => <h3>Extra configurations by open options</h3>}
+                    title={() => <h3>open 方法额外的 options 配置</h3>}
                     columns={[
                         {
-                            title: '参数 param',
+                            title: '参数',
                             dataIndex: 'prop',
                             key: 'prop',
                             width: 160
                         },
                         {
-                            title: '说明 description',
+                            title: '说明',
                             dataIndex: 'description',
                             key: 'description',
                             width: 320
                         },
                         {
-                            title: '类型 type',
+                            title: '类型',
                             dataIndex: 'type',
                             key: 'type',
                             width: 320
                         },
                         {
-                            title: '默认值 dafaultValue',
+                            title: '默认值',
                             dataIndex: 'dafaultValue',
                             key: 'dafaultValue',
                         },
                     ]}
                     dataSource={[
                         {
-                            prop: 'dialogboxRoot',
-                            description: '设置 dialogbox 应该在哪渲染',
+                            prop: 'containerNode',
+                            description: '设置 dialogbox 应该在哪个 DOM 元素内渲染',
                             type: 'DOM Element',
-                            dafaultValue: 'document.body #dialogboxRoot',
+                            dafaultValue: 'document.body #dialogbox-root',
                         },
                     ]}
                 />
             </Form.Item>
             <Form.Item>
                 <Table
+                    rowKey={record => record.prop}
                     pagination={false}
-                    title={() => <h3>Dialogbox instance by (open / showDialogbox)</h3>}
+                    title={() => <h3>使用 open 或 showDialogbox 方法返回的 dialogbox 实例对象</h3>}
                     columns={[
                         {
-                            title: '属性名 key',
+                            title: '属性名',
                             dataIndex: 'prop',
                             key: 'prop',
                             width: 160
                         },
                         {
-                            title: '说明 description',
+                            title: '说明',
                             dataIndex: 'description',
                             key: 'description',
                             width: 320
@@ -250,15 +276,15 @@ const Api = () => {
                     dataSource={[
                         {
                             prop: 'DOM',
-                            description: 'Dialogbox DOM Element',
+                            description: 'Dialogbox 最外层 fiber 对应的 DOM 元素',
                         },
                         {
                             prop: 'dialogboxId',
-                            description: '对应的唯一 id，可以用来关闭 dialogbox',
+                            description: '对应的唯一 Id，可以用来关闭 Id 对应的对话框',
                         },
                         {
                             prop: 'close',
-                            description: '用于关闭该 dialogbox 的方法，无需 id',
+                            description: '用于关闭该对话框的方法，无需 Id',
                         },
                         {
                             prop: 'reactElement',

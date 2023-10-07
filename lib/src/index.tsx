@@ -9,7 +9,7 @@ const DragDialogbox = (props: IDialogboxProps) => {
     return <Dialogbox {..._props} />
 }
 
-export const { open, showDialogbox, hideDialogbox } = dialogboxMethod;
+export const { open, showDialogbox, hideDialogbox, setOption } = dialogboxMethod;
 
 export default dialogboxMethod;
 

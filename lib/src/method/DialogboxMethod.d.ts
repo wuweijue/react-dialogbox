@@ -1,3 +1,5 @@
+import { IDialogboxProps } from '../Dialogbox.d'
+
 export default interface IDialogboxMethod {
 
     /**
@@ -34,45 +36,9 @@ export default interface IDialogboxMethod {
 
 }
 
-export interface IOptions {
-
-    isModal?: boolean
+export interface IOptions extends IDialogboxProps {
 
     containerNode?: HTMLElement 
-
-    header?: boolean
-
-    maskClosable?: boolean
-
-    children?: JSX.Element | string
-
-    draggable?: boolean
-
-    fullScreen?: boolean
-
-    mask?: boolean
-
-    bodyStyle?: any 
-
-    className?: string
-
-    width?: number | string
-
-    height?: number | string
-
-    okText?: string | JSX.Element
-
-    title?: string | JSX.Element
-
-    cancelText?: string | JSX.Element
-
-    footer?: string | JSX.Element | boolean | null
-
-    afterClose?(): void
-
-    onOk?(): void
-
-    onCancel?(): void
 }
 
 export interface IDialogbox{

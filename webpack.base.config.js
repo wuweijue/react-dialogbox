@@ -1,11 +1,22 @@
 const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const packageName = require('./package.json').name;
 
 const webpackBaseConfig = {
+    target: 'web',
     entry: [
         path.join(__dirname, './page/index.tsx'),
     ],
+    output: {
+        path: path.join(__dirname, './dist'),
+        filename: 'index.js',
+        clean: true,
+        library: 'react-dialogbox',
+        libraryTarget: 'umd',
+        chunkLoadingGlobal: `webpackJsonp_${packageName}`,
+        globalObject: 'window'
+    },
     module: {
         rules: [
             {
@@ -68,7 +79,7 @@ const webpackBaseConfig = {
             template: './page/index.html'
         }),
         new MiniCssExtractPlugin({
-            filename: './dist/react-dialogbox.css'
+            filename: 'main.css'
         })
     ],
     resolve: {

@@ -179,7 +179,7 @@ class Dialogbox extends React.Component<IDialogboxProps, any> {
             }
 
             //避免拖动过程中文本被选中
-            window.getSelection ? window.getSelection().removeAllRanges() : (document as any).selection.empty();
+            window.getSelection ? window.getSelection()?.removeAllRanges() : (document as any).selection.empty();
 
             let curCLientX = (event.clientX > 10 ? (event.clientX < document.body.clientWidth - 10 ? event.clientX : document.body.clientWidth - 10) : 10);
 
@@ -244,6 +244,7 @@ class Dialogbox extends React.Component<IDialogboxProps, any> {
                 this.handleExtend('left');
             }
             if (event.clientX > document.body.clientWidth - 10) {
+                extendMaskDOMX.classList.add('mask-out-right')
                 this.handleExtend('right');
             }
 

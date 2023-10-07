@@ -1,4 +1,4 @@
-import IDialogboxStore from './DialogboxStore.d';
+import IDialogboxStore, { dialogboxItem } from './DialogboxStore.d';
 import { observable } from '../publish-subscribe';
 
 class DialogboxStore implements IDialogboxStore {
@@ -25,6 +25,16 @@ class DialogboxStore implements IDialogboxStore {
                 this.validFunction(instance.onCancel)
             }
         })
+
+        const maskX = document.querySelector('.dialogbox-extend-mask-x')
+        if(!maskX){
+            const extendMaskDOMX = document.createElement('div');
+            const extendMaskDOMY = document.createElement('div');
+            extendMaskDOMX.className = 'dialogbox-extend-mask-x';
+            extendMaskDOMY.className = 'dialogbox-extend-mask-y'; 
+            document.body.appendChild(extendMaskDOMX);
+            document.body.appendChild(extendMaskDOMY);
+        }
     }
 
     validFunction = (callback, event?) => {
@@ -34,21 +44,21 @@ class DialogboxStore implements IDialogboxStore {
         return callback(event)
     }
 
-    dialogboxList = [];
+    dialogboxList: dialogboxItem[] = [];
 
     // 获取当前被聚焦的元素
     getFocusItem() {
-        return this.dialogboxList.length && this.dialogboxList[this.dialogboxList.length - 1]
+        return ((this.dialogboxList.length && this.dialogboxList[this.dialogboxList.length - 1]) as dialogboxItem)
     }
 
     // 当前被聚焦元素的层级，即最高层级
     focusZIndex = 1000;
 
     // 获取dialogboxId对应的对话框react对象
-    findItemById(dialogboxId) {
-        return this.dialogboxList.find(item => {
+    findItemById(dialogboxId: number) {
+        return (this.dialogboxList.find(item => {
             return item.dialogboxId == dialogboxId;
-        });
+        }) as dialogboxItem);
     }
 
     // 注册新生成的对话框
