@@ -1,6 +1,6 @@
 {
   "name": "react-dialogbox",
-  "version": "2.0.1",
+  "version": "2.0.3",
   "main": "lib/index.js",
   "author": "wuweijue",
   "homepage": "https://wuweijue.github.io/#/dialogbox",
@@ -34,7 +34,6 @@
     "classnames": "^2.3.1",
     "monaco-editor": "^0.39.0",
     "react": "^16.8.4",
-    "react-dialogbox": "^2.0.2",
     "react-dom": "^16.8.4",
     "react-monaco-editor": "^0.54.0",
     "react-syntax-highlighter": "^15.5.0"
@@ -70,14 +69,12 @@
     "url-loader": "^4.1.1",
     "webpack": "^5.38.1",
     "webpack-cli": "^4.7.2",
-    "webpack-dev-server": "^3.11.2",
+    "webpack-copy-plugin": "^0.0.4",
+    "webpack-dev-server": "^4.15.1",
     "webpack-merge": "^5.0.9",
     "webpack-node-externals": "^2.5.0",
     "yarn": "^1.22.18"
   },
-  "files": [
-    "lib"
-  ],
   "babel": {
     "plugins": [
       [
