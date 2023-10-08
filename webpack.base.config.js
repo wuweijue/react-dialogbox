@@ -9,7 +9,7 @@ const webpackBaseConfig = {
         path.join(__dirname, './page/index.tsx'),
     ],
     output: {
-        path: path.join(__dirname, './dist'),
+        path: path.join(__dirname, './docs'),
         filename: 'index.js',
         clean: true,
         library: 'react-dialogbox',

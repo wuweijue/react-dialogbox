@@ -1,7 +1,7 @@
 @echo off  
 chcp 65001 > nul  
 set "source_dir=D:\project\react-dialogbox\dist"  
-set "target_dir=D:\project\main\dist\react-dialogbox"  
+set "target_dir=D:\project\main\public\react-dialogbox"  
   
 echo 正在清空目标目录...  
   

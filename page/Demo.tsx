@@ -9,7 +9,7 @@ import Explain from './components/Explain';
 class DialogDemo extends React.Component {
 
     state = {
-        activeKey: '3',
+        activeKey: '0',
         theme: 'dark'
     }
 

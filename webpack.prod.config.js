@@ -8,10 +8,6 @@ const { exec } = require('child_process');
 const webpackProdConfig = {
     mode: 'production',
     devtool: 'source-map',
-
-    externals: [
-        // nodeExternals() 
-    ],
     optimization: {
         minimizer: [
             new TerserPlugin({
