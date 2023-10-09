@@ -1,5 +1,5 @@
 import * as React from 'react';
-import * as classNames  from 'classnames';
+import * as classNames from 'classnames';
 import './Tab.less';
 
 interface Item {
@@ -26,7 +26,7 @@ class Tab extends React.Component<ITabViewProps, any> {
     tabRef;
     onLoad = false;
 
-    componentDidMount() { 
+    componentDidMount() {
         this.setState({
             width: this.tabRef?.clientWidth
         })
@@ -67,11 +67,11 @@ class Tab extends React.Component<ITabViewProps, any> {
                 <div className='tab-bar-list'>
                     {
                         tabList.map((item, idx) => {
-                            return <div className={classNames('tab-bar-item', { 'active': activeKey === item.key })} key={item.key || idx}>
+                            return <div onClick={() => {
+                                onChange && onChange(item.key)
+                            }} className={classNames('tab-bar-item', { 'active': activeKey === item.key })} key={item.key || idx}>
                                 <div className={classNames('tab-bar-item-active-tip', { 'active': activeKey === item.key })}></div>
-                                <div className='tab-bar-item-title' onClick={() => {
-                                    onChange && onChange(item.key)
-                                }}>
+                                <div className='tab-bar-item-title' >
                                     {item.title}
                                 </div>
                                 <div className={classNames('tab-bar-item-active-close', { 'disClosable': item.closable === false })} onClick={() => {

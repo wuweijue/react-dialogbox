@@ -372,24 +372,35 @@ class Dialogbox extends React.Component<IDialogboxProps, any> {
             marginTop = 0 - 0.5 * height;
             marginLeft = 0 - 0.5 * width;
         }
-        this.setState({
-            historyWidth: this.state.width,
-            historyHeight: this.state.height,
-            marginTop,
-            marginLeft,
-            toRight,
-            toBottom,
-            draggable,
-            historyToBottom: this.state.toBottom,
-            historyToRight: this.state.toRight,
-            isExtend: !isExtend,
-            width,
-            height,
-            transition: '0.4s'
-        })
-        setTimeout(() => this.setState({
-            transition: 'none'
-        }), 400)
+
+        const callback = () => {
+            this.setState({
+                historyWidth: this.state.width,
+                historyHeight: this.state.height,
+                marginTop,
+                marginLeft,
+                toRight,
+                toBottom,
+                draggable,
+                historyToBottom: this.state.toBottom,
+                historyToRight: this.state.toRight,
+                isExtend: !isExtend,
+                width,
+                height,
+                transition: '0.4s'
+            })
+            setTimeout(() => this.setState({
+                transition: 'none'
+            }), 400)
+        }
+
+        if(value === true) {
+            setTimeout(()=>{
+                callback()
+            },500)
+        } else {
+            callback()
+        }
     }
 
     //聚焦
@@ -409,7 +420,7 @@ class Dialogbox extends React.Component<IDialogboxProps, any> {
         const { byOpen, fullScreen } = this.props;
         // 如果是通过open方法打开，需要单独判断是否初始全屏
         if (byOpen && fullScreen) {
-            this.handleExtend(true)
+            this.handleExtend(null, true)
         }
 
         // 注册点击阴影触发onCancel事件

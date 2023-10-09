@@ -2,7 +2,7 @@ const path = require('path');
 const { merge } = require('webpack-merge');
 const webpackBaseConfig = require('./webpack.base.config');
 
-const port = '5000';
+const port = '5001';
 
 const webpackDevConfig = {
     mode: "development",
